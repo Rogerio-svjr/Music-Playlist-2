@@ -32,7 +32,10 @@ public class MusicplaylistApplication implements CommandLineRunner{
 		TrackSearchResult trackResult = convertsData.GetData(json, TrackSearchResult.class);
 		Tracks track = trackResult.getTracks();
 		List<TrackItem> items = track.getItems();
-		System.out.println(items.get(0).getName() + " - " + items.get(0).getArtists().get(0).getName());
+		for( TrackItem item : items )
+		{
+			System.out.println(items.get(0).getName() + " - " + items.get(0).getArtists().get(0).getName());
+		}
 	}
 
 }

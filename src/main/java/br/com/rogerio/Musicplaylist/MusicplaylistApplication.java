@@ -27,12 +27,12 @@ public class MusicplaylistApplication implements CommandLineRunner{
 		var convertsData = new ConvertsData();
 		AccessToken token = convertsData.GetData(json, AccessToken.class);
 		//System.out.println(token);
-		json = apiConsumption.trackRequest("savior", token.accessToken());
+		json = apiConsumption.trackRequest("Savior", token.accessToken());
 		//System.out.println(json);
 		TrackSearchResult trackResult = convertsData.GetData(json, TrackSearchResult.class);
 		Tracks track = trackResult.getTracks();
 		List<TrackItem> items = track.getItems();
-		System.out.println(items.get(0).getName());
+		System.out.println(items.get(0).getName() + " - " + items.get(0).getArtists().get(0).getName());
 	}
 
 }

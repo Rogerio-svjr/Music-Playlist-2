@@ -6,12 +6,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import br.com.rogerio.Musicplaylist.models.AccessToken;
 import br.com.rogerio.Musicplaylist.models.TrackItem;
 import br.com.rogerio.Musicplaylist.models.TrackSearchResult;
 import br.com.rogerio.Musicplaylist.models.Tracks;
 import br.com.rogerio.Musicplaylist.service.ApiConsumption;
-import br.com.rogerio.Musicplaylist.service.ConvertsData;
 
 @SpringBootApplication
 public class MusicplaylistApplication implements CommandLineRunner{
@@ -20,22 +18,17 @@ public class MusicplaylistApplication implements CommandLineRunner{
 	}
 
 	@Override
-	public void run(String... args) throws Exception {
+	public void run(String... args) throws Exception 
+  {
 		var apiConsumption = new ApiConsumption();
-		var json = apiConsumption.tokenRequest();
-		//System.out.println(json);
-		var convertsData = new ConvertsData();
-		AccessToken token = convertsData.GetData(json, AccessToken.class);
-		//System.out.println(token);
-		json = apiConsumption.trackRequest("Savior", token.accessToken());
-		//System.out.println(json);
-		TrackSearchResult trackResult = convertsData.GetData(json, TrackSearchResult.class);
+		TrackSearchResult trackResult = apiConsumption.trackRequest( "Savior" );
 		Tracks track = trackResult.getTracks();
 		List<TrackItem> items = track.getItems();
-		for( TrackItem item : items )
-		{
-			System.out.println(items.get(0).getName() + " - " + items.get(0).getArtists().get(0).getName());
+
+		try {
+			items.forEach( item -> System.out.println( item.getName() + " - " + item.getArtists().get(0).getName() ) );
+		} catch ( IndexOutOfBoundsException e ) {
+			System.out.println( "Index out of bounds" );
 		}
 	}
-
 }

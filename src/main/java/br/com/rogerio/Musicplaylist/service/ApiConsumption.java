@@ -15,6 +15,9 @@ public class ApiConsumption {
 	HttpClient client = HttpClient.newHttpClient();
 	ConvertsData convertsData = new ConvertsData();
 
+	private byte searchOffset = 0;
+	private String currentTrackName = null;
+
 	private AccessToken tokenRequest() {
 		// Request body from a String
 		String bodyStr = "grant_type=client_credentials";
@@ -40,23 +43,34 @@ public class ApiConsumption {
 		return convertsData.GetData( responsePOST.body(), AccessToken.class );
 	}
 
-	public TrackSearchResult trackRequest( String searchURL ) {
+	public TrackSearchResult trackRequest( String trackName ) {
+		currentTrackName = trackName;
 		AccessToken token = this.tokenRequest();
 		String accessToken = token.accessToken().replace(" ", "+");
-
+		
 		HttpRequest requestTrack = HttpRequest.newBuilder()
-			.uri( URI.create( "https://api.spotify.com/v1/search?q=" + searchURL + "&type=track&limit=30&offset=1" ) )
-			.header( "Authorization", "Bearer " + accessToken )
-			.build();
-
+		.uri( URI.create( "https://api.spotify.com/v1/search?q=" + trackName + "&type=track&limit=10&offset=" + searchOffset ) )
+		.header( "Authorization", "Bearer " + accessToken )
+		.build();
+		
 		HttpResponse<String> responseGET = null;
-
+		
 		try {
 			responseGET = client.send( requestTrack, HttpResponse.BodyHandlers.ofString() );
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
-
+		
 		return convertsData.GetData( responseGET.body(), TrackSearchResult.class );
+	}
+	
+	public TrackSearchResult nextTrackRequestPage( ) {
+		searchOffset += 10;
+		return this.trackRequest(currentTrackName);
+	}
+
+	public TrackSearchResult previousTrackRequestPage( ) {
+		searchOffset -= 10;
+		return this.trackRequest(currentTrackName);
 	}
 }

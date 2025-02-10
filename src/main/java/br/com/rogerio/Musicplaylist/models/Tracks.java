@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Tracks {
-    private List<TrackItem> items;
+  private List<TrackItem> items;
 
-    public List<TrackItem> getItems() {
-        return items;
-    }
+  public List<TrackItem> getItems() {
+    return items;
+  }
 }

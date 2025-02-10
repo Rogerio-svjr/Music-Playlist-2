@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TrackSearchResult {
-    private Tracks tracks;
+	private Tracks tracks;
 
-    public Tracks getTracks() {
-        return tracks;
-    }
+	public Tracks getTracks() {
+		return tracks;
+	}
 }

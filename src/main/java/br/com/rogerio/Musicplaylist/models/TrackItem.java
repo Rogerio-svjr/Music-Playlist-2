@@ -23,6 +23,15 @@ public class TrackItem {
 		return duration_ms;
 	}
 
+	public float getDuration_s() {
+		return duration_ms / 1000;
+	}
+
+	public String getDuration_min() {
+		float f_durationMin = this.getDuration_s() / 60;
+		return String.format("%d:%02d", (int) f_durationMin, (int) (( f_durationMin - (int) f_durationMin ) * 60) );
+	}
+
 	public String getName() {
 		return name;
 	}

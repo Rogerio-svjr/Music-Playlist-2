@@ -36,7 +36,7 @@ public class ApiConsumption {
 		HttpResponse<String> responsePOST = null;
 		try {
 			responsePOST = client.send( requestToken, BodyHandlers.ofString() );
-		} catch (InterruptedException | IOException e) {
+		} catch ( InterruptedException | IOException e ) {
 			e.printStackTrace();
 		}
 
@@ -66,11 +66,11 @@ public class ApiConsumption {
 	
 	public TrackSearchResult nextTrackRequestPage( ) {
 		searchOffset += 10;
-		return this.trackRequest(currentTrackName);
+		return this.trackRequest( currentTrackName );
 	}
 
 	public TrackSearchResult previousTrackRequestPage( ) {
 		searchOffset -= 10;
-		return this.trackRequest(currentTrackName);
+		return this.trackRequest( currentTrackName );
 	}
 }

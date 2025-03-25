@@ -42,8 +42,8 @@ public class MusicplaylistApplication implements CommandLineRunner{
 		// Print track information
 		System.out.println( 
 			"\nName: " + track.getName() +
-			"\nAtrist: " + track.getArtists().get( 0 ).getName() +
-			"\nAlbum: " + track.getAlbum().getName() +
+			"\nAtrist: " + track.getArtistName() +
+			"\nAlbum: " + track.getAlbumName() +
 			"\nDuration: " + track.getDuration_min() );
 
 		keyboard.close();

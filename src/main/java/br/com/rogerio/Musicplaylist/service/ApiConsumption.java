@@ -8,8 +8,9 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Base64;
-import br.com.rogerio.Musicplaylist.models.AccessToken;
-import br.com.rogerio.Musicplaylist.models.TrackSearchResult;
+
+import br.com.rogerio.Musicplaylist.entity.AccessToken;
+import br.com.rogerio.Musicplaylist.entity.TrackSearchResult;
 
 public class ApiConsumption {
 	HttpClient client = HttpClient.newHttpClient();

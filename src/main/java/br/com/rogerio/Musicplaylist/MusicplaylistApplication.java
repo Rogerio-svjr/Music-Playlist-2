@@ -7,8 +7,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import br.com.rogerio.Musicplaylist.models.TrackItem;
-import br.com.rogerio.Musicplaylist.models.TrackSearchResult;
+import br.com.rogerio.Musicplaylist.entity.Music;
+import br.com.rogerio.Musicplaylist.entity.TrackSearchResult;
 import br.com.rogerio.Musicplaylist.service.ApiConsumption;
 
 @SpringBootApplication
@@ -23,7 +23,7 @@ public class MusicplaylistApplication implements CommandLineRunner{
 
 		// Searches a track named "savior" and receives 10 results  
 		TrackSearchResult trackResult = apiConsumption.trackRequest( "Savior" );
-		List<TrackItem> items = trackResult.getTracks().getItems();
+		List<Music> items = trackResult.getPlaylist().getMusic();
 		// Print the results
 		try {
 			items.forEach( item -> System.out.println( ( items.indexOf( item ) + 1 ) + " - " + item.getName() + 
@@ -38,7 +38,7 @@ public class MusicplaylistApplication implements CommandLineRunner{
 		System.out.println();
 		System.out.print( "Choose track: " );
 		byte user = keyboard.nextByte();
-		TrackItem track = items.get( user - 1 );
+		Music track = items.get( user - 1 );
 		// Print track information
 		System.out.println( 
 			"\nName: " + track.getName() +
@@ -53,9 +53,9 @@ public class MusicplaylistApplication implements CommandLineRunner{
   {
 		var apiConsumption = new ApiConsumption();
 
-		// Searches a track named "savior" and receives 10 results  
+		// Searches a track named "savior" and receives 10 results 
 		TrackSearchResult trackResult = apiConsumption.trackRequest( "Savior" );
-		List<TrackItem> items = trackResult.getTracks().getItems();
+		List<Music> items = trackResult.getPlaylist().getMusic();
 		// Print the results
 		try {
 			items.forEach( item -> System.out.println( item.getName() + " - " + item.getArtists().get(0).getName() ) );
@@ -65,7 +65,7 @@ public class MusicplaylistApplication implements CommandLineRunner{
 
 		// Searches and prints the next 10 results
 		trackResult = apiConsumption.nextTrackRequestPage();
-		items = trackResult.getTracks().getItems();
+		items = trackResult.getPlaylist().getMusic();
 		System.out.println();
 		try {
 			items.forEach( item -> System.out.println( item.getName() + " - " + item.getArtists().get(0).getName() ) );
@@ -75,7 +75,7 @@ public class MusicplaylistApplication implements CommandLineRunner{
 
 		// Searches previous 10 results again 
 		trackResult = apiConsumption.previousTrackRequestPage();
-		items = trackResult.getTracks().getItems();
+		items = trackResult.getPlaylist().getMusic();
 		System.out.println();
 		try {
 			items.forEach( item -> System.out.println( item.getName() + " - " + item.getArtists().get(0).getName() ) );

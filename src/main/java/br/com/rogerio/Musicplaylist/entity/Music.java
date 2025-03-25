@@ -1,11 +1,13 @@
-package br.com.rogerio.Musicplaylist.models;
+package br.com.rogerio.Musicplaylist.entity;
 
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.Entity;
 
+// @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TrackItem {
+public class Music {
 	private Album album;
 	private List<Artist> artists;
 	private int duration_ms;

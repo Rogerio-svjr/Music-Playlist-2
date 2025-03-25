@@ -1,4 +1,4 @@
-package br.com.rogerio.Musicplaylist.models;
+package br.com.rogerio.Musicplaylist.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

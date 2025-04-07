@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TrackSearchResult {
 	@JsonProperty("tracks")
-	private Playlist playlist;
+	private PlaylistEntity playlist;
 
-	public Playlist getPlaylist() {
+	public PlaylistEntity getPlaylist() {
 		return playlist;
 	}
 }

@@ -45,6 +45,7 @@ public class ApiConsumption {
 	}
 
 	public TrackSearchResult trackRequest( String trackName ) {
+		trackName = trackName.replace(" ", "-");
 		currentTrackName = trackName;
 		AccessToken token = this.tokenRequest();
 		String accessToken = token.accessToken().replace(" ", "+");

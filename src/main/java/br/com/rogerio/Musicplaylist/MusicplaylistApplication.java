@@ -7,7 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import br.com.rogerio.Musicplaylist.entity.Music;
+import br.com.rogerio.Musicplaylist.entity.MusicEntity;
 import br.com.rogerio.Musicplaylist.entity.TrackSearchResult;
 import br.com.rogerio.Musicplaylist.service.ApiConsumption;
 
@@ -22,8 +22,8 @@ public class MusicplaylistApplication implements CommandLineRunner{
 		var apiConsumption = new ApiConsumption();
 
 		// Searches a track named "savior" and receives 10 results  
-		TrackSearchResult trackResult = apiConsumption.trackRequest( "Savior" );
-		List<Music> items = trackResult.getPlaylist().getMusic();
+		TrackSearchResult trackResult = apiConsumption.trackRequest( "The Emptiness Machine" );
+		List<MusicEntity> items = trackResult.getPlaylist().getMusic();
 		// Print the results
 		try {
 			items.forEach( item -> System.out.println( ( items.indexOf( item ) + 1 ) + " - " + item.getName() + 
@@ -38,7 +38,7 @@ public class MusicplaylistApplication implements CommandLineRunner{
 		System.out.println();
 		System.out.print( "Choose track: " );
 		byte user = keyboard.nextByte();
-		Music track = items.get( user - 1 );
+		MusicEntity track = items.get( user - 1 );
 		// Print track information
 		System.out.println( 
 			"\nName: " + track.getName() +
@@ -55,7 +55,7 @@ public class MusicplaylistApplication implements CommandLineRunner{
 
 		// Searches a track named "savior" and receives 10 results 
 		TrackSearchResult trackResult = apiConsumption.trackRequest( "Savior" );
-		List<Music> items = trackResult.getPlaylist().getMusic();
+		List<MusicEntity> items = trackResult.getPlaylist().getMusic();
 		// Print the results
 		try {
 			items.forEach( item -> System.out.println( item.getName() + " - " + item.getArtists().get(0).getName() ) );

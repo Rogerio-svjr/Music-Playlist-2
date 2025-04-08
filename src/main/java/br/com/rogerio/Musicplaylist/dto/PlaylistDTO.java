@@ -21,7 +21,6 @@ public class PlaylistDTO {
   public PlaylistDTO() {
 
   }
-  
   // Getters
   public Long getId() {
     return id;

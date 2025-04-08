@@ -18,7 +18,7 @@ public class MusicEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonIgnore
-	private short id;
+	private Long id;
 	
 	@Column(nullable = false)
 	private String name;
@@ -52,7 +52,7 @@ public class MusicEntity {
 	}
 
 	//Getters
-	public short getId() {
+	public Long getId() {
 		return id;
 	}
 	
@@ -98,7 +98,7 @@ public class MusicEntity {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + id;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((artists == null) ? 0 : artists.hashCode());
 		return result;
@@ -113,7 +113,10 @@ public class MusicEntity {
 		if (getClass() != obj.getClass())
 			return false;
 		MusicEntity other = (MusicEntity) obj;
-		if (id != other.id)
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
 			return false;
 		if (name == null) {
 			if (other.name != null)

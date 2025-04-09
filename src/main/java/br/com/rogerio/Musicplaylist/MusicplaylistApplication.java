@@ -2,11 +2,14 @@ package br.com.rogerio.Musicplaylist;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import br.com.rogerio.Musicplaylist.dto.MusicDTO;
 import br.com.rogerio.Musicplaylist.entity.MusicEntity;
 import br.com.rogerio.Musicplaylist.entity.TrackSearchResult;
 import br.com.rogerio.Musicplaylist.service.ApiConsumption;
@@ -22,7 +25,7 @@ public class MusicplaylistApplication implements CommandLineRunner{
 		var apiConsumption = new ApiConsumption();
 
 		// Searches a track named "savior" and receives 10 results  
-		TrackSearchResult trackResult = apiConsumption.trackRequest( "The Emptiness Machine" );
+		TrackSearchResult trackResult = apiConsumption.trackRequest( "Kingslayer" );
 		List<MusicEntity> items = trackResult.getPlaylist().getMusic();
 		// Print the results
 		try {
@@ -38,15 +41,23 @@ public class MusicplaylistApplication implements CommandLineRunner{
 		System.out.println();
 		System.out.print( "Choose track: " );
 		byte user = keyboard.nextByte();
-		MusicEntity track = items.get( user - 1 );
+		keyboard.close();
+		MusicDTO track = new MusicDTO(items.get( user - 1 ));
 		// Print track information
 		System.out.println( 
+			"\nDTO Print:" +
 			"\nName: " + track.getName() +
-			"\nAtrist: " + track.getArtistName() +
-			"\nAlbum: " + track.getAlbumName() +
+			"\nArtist: " + track.getArtistsNames() +
+			"\nAlbum: " + track.getAlbum() +
 			"\nDuration: " + track.getDuration_min() );
-
-		keyboard.close();
+		
+		MusicEntity trackEntity = new MusicEntity(track);
+		System.out.println( 
+			"\nEntity Print:" +
+			"\nName: " + trackEntity.getName() +
+			"\nArtist: " + trackEntity.getArtistsNames() +
+			"\nAlbum: " + trackEntity.getAlbumName() +
+			"\nDuration: " + trackEntity.getDuration_ms() );
 	}
 
 	public void testTrackSearch() throws Exception 

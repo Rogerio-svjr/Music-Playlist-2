@@ -9,4 +9,10 @@ public class Artist {
     public String getName() {
         return name;
     }
+
+    public Artist(String name) {
+        this.name = name;
+    }
+    public Artist(){
+    }
 }

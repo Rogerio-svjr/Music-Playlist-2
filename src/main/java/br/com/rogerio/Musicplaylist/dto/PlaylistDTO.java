@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.beans.BeanUtils;
 
 public class PlaylistDTO {
-  // Class field
+  // Class properteies
   private Long id;
 
   private String name;
@@ -17,7 +17,6 @@ public class PlaylistDTO {
   public PlaylistDTO( PlaylistEntity playlist ){
     BeanUtils.copyProperties(playlist, this);
   }
-
   public PlaylistDTO() {
 
   }
@@ -25,11 +24,9 @@ public class PlaylistDTO {
   public Long getId() {
     return id;
   }
-
   public String getName() {
     return name;
   }
-
   public List<MusicDTO> getMusic() {
     return music;
   }

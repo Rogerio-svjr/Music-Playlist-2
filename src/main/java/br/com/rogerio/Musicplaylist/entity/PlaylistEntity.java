@@ -13,7 +13,7 @@ import jakarta.persistence.*;
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlaylistEntity {
-  // Class fields
+  // Class properties
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -29,7 +29,6 @@ public class PlaylistEntity {
   public PlaylistEntity( PlaylistDTO playlist ){
     BeanUtils.copyProperties(playlist, this);
   }
-
   public PlaylistEntity(){
 
   }
@@ -38,15 +37,12 @@ public class PlaylistEntity {
   public List<MusicEntity> getMusic() {
     return music;
   }
-
   public Long getId() {
     return id;
   }
-
   public String getName() {
     return name;
   }
-
   public void setName(String name) {
     this.name = name;
   }

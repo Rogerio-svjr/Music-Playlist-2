@@ -1,57 +1,64 @@
 package br.com.rogerio.Musicplaylist.dto;
+import br.com.rogerio.Musicplaylist.entity.Artist;
 import br.com.rogerio.Musicplaylist.entity.MusicEntity;
 
 import java.util.List;
-
-import org.springframework.beans.BeanUtils;
-
+import java.util.stream.Collectors;
 
 public class MusicDTO {
-  // Class field
-  private short id;
+  // Class properties
+  private Long id;
 	
 	private String name;
 	
-	private List<String> artists;
+	private List<String> artistsList;
 	
 	private String album;
   
-	private int duration_ms;
+	private float duration_s;
   
 	private PlaylistDTO playlist;
 
   // Constructors
   public MusicDTO( MusicEntity music ) {
-    BeanUtils.copyProperties(music, this);
-    return;
+    this.id = music.getId();
+    this.name = music.getName();
+    this.artistsList = music.getArtists().stream().map(Artist::getName).toList();
+    this.album = music.getAlbumName();
+    this.duration_s = music.getDuration_ms() / 1000;
+    // this.playlist = new PlaylistDTO( music.getPlaylist() );
   }
-
   public MusicDTO() {
-
   }
 
   // Getters
-  public short getId() {
+  public Long getId() {
     return id;
   }
-
   public String getName() {
     return name;
   }
-
-  public List<String> getArtists() {
-    return artists;
+  public List<String> getArtistsList() {
+    return artistsList;
   }
-
   public String getAlbum() {
     return album;
   }
-
-  public int getDuration_ms() {
-    return duration_ms;
+  public float getDuration_s() {
+    return duration_s;
   }
-
   public PlaylistDTO getPlaylist() {
     return playlist;
   }
+
+  // Methods
+  // Display string of the music artists separated by column
+  public String getArtistsNames() {
+    return artistsList.stream().collect(Collectors.joining(", "));
+  }
+  // Display string of the duration in minutes
+  public String getDuration_min() {
+		float f_durationMin = this.getDuration_s() / 60;
+		return String.format("%d:%02d", (int) f_durationMin, (int) (( f_durationMin - (int) f_durationMin ) * 60) );
+	}
 }

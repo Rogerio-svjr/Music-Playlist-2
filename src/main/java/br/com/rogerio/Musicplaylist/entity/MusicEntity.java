@@ -1,15 +1,22 @@
 package br.com.rogerio.Musicplaylist.entity;
+import br.com.rogerio.Musicplaylist.dto.MusicDTO;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import br.com.rogerio.Musicplaylist.dto.MusicDTO;
 import jakarta.persistence.*;
 
 @Entity
+@Table(
+	name = "music_entity",
+	uniqueConstraints = {
+		@UniqueConstraint(columnNames = {"name", "artistsNames"})
+	}
+)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MusicEntity {
 	// Class properties
@@ -30,8 +37,7 @@ public class MusicEntity {
 	@Transient
 	private Album album;
 
-	@Column(nullable = false)
-	private String AlbumName;
+	private String albumName;
 	
 	@Column(nullable = false)
 	private int duration_ms;
@@ -40,14 +46,22 @@ public class MusicEntity {
 	@JoinColumn(name = "playlist_id")
 	private PlaylistEntity playlist;
 
+	private boolean liked = false;
+
 	//Constructors
 	public MusicEntity( MusicDTO music ){
 		this.id = music.getId();
     this.name = music.getName();
 		this.artists = music.getArtistsList().stream().map(Artist::new).toList();
+		this.artistsNames = this.getArtistsNames();
 		this.album = new Album(music.getAlbum());
+		this.albumName = this.getAlbumName();
 		this.duration_ms = (int) music.getDuration_s() * 1000;
-		// this.playlist = new PlaylistEntity( music.getPlaylist() );
+		try {
+			this.playlist = new PlaylistEntity( music.getPlaylist() );
+		} catch( NullPointerException e ) {
+		}
+		this.liked = music.getLiked();
 	}
 	public MusicEntity() {
 	}
@@ -60,14 +74,22 @@ public class MusicEntity {
 		return name;
 	}
 	public List<Artist> getArtists() {
+		if( this.artists == null && this.artistsNames != null) {
+			this.artists = Arrays.stream(artistsNames.split(","))
+				.map(String::trim)
+				.map(Artist::new)
+				.toList();
+		}
 		return artists;
 	}
 	public String getArtistsNames(){
-		// return this.getArtists().get(0).getName();
 		List<String> artistsList = this.getArtists().stream().map(Artist::getName).toList();
 		return artistsList.stream().collect(Collectors.joining(", "));
 	}
 	public Album getAlbum() {
+		if( this.album == null && this.albumName != null ) {
+			this.album = new Album(albumName);
+		}
 		return album;
 	}
 	public String getAlbumName(){
@@ -78,6 +100,17 @@ public class MusicEntity {
 	}
 	public PlaylistEntity getPlaylist() {
 		return playlist;
+	}
+	public boolean getLiked() {
+		return liked;
+	}
+
+	//Setters
+	public void setPlaylist(PlaylistEntity playlist) {
+		this.playlist = playlist;
+	}
+	public void setLiked(boolean liked) {
+		this.liked = liked;
 	}
 
 	// HashCode and Equals
@@ -90,6 +123,7 @@ public class MusicEntity {
 		result = prime * result + ((artists == null) ? 0 : artists.hashCode());
 		return result;
 	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

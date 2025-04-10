@@ -19,6 +19,8 @@ public class MusicDTO {
   
 	private PlaylistDTO playlist;
 
+  private boolean liked;
+
   // Constructors
   public MusicDTO( MusicEntity music ) {
     this.id = music.getId();
@@ -26,7 +28,11 @@ public class MusicDTO {
     this.artistsList = music.getArtists().stream().map(Artist::getName).toList();
     this.album = music.getAlbumName();
     this.duration_s = music.getDuration_ms() / 1000;
-    // this.playlist = new PlaylistDTO( music.getPlaylist() );
+    try {
+      this.playlist = new PlaylistDTO( music.getPlaylist() );
+    } catch( NullPointerException e ) {
+    }
+    this.liked = music.getLiked();
   }
   public MusicDTO() {
   }
@@ -50,6 +56,17 @@ public class MusicDTO {
   public PlaylistDTO getPlaylist() {
     return playlist;
   }
+  public boolean getLiked() {
+    return liked;
+  }
+
+  //Setters
+	public void setPlaylist(PlaylistDTO playlist) {
+		this.playlist = playlist;
+	}
+	public void setLiked(boolean liked) {
+		this.liked = liked;
+	}
 
   // Methods
   // Display string of the music artists separated by column

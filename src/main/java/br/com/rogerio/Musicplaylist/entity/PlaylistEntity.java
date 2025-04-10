@@ -3,7 +3,7 @@ import br.com.rogerio.Musicplaylist.dto.PlaylistDTO;
 
 import java.util.List;
 
-import org.springframework.beans.BeanUtils;
+// import org.springframework.beans.BeanUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -27,10 +27,12 @@ public class PlaylistEntity {
   
   // Constructors
   public PlaylistEntity( PlaylistDTO playlist ){
-    BeanUtils.copyProperties(playlist, this);
+    // BeanUtils.copyProperties(playlist, this);
+    this.id = playlist.getId();
+    this.name = playlist.getName();
+    this.music = playlist.getMusic().stream().map(MusicEntity::new).toList();
   }
   public PlaylistEntity(){
-
   }
 
   // Getters

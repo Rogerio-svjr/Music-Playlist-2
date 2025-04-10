@@ -2,20 +2,23 @@ package br.com.rogerio.Musicplaylist;
 
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import br.com.rogerio.Musicplaylist.dto.MusicDTO;
 import br.com.rogerio.Musicplaylist.entity.MusicEntity;
 import br.com.rogerio.Musicplaylist.entity.TrackSearchResult;
 import br.com.rogerio.Musicplaylist.service.ApiConsumption;
+import br.com.rogerio.Musicplaylist.service.MusicService;
 
 @SpringBootApplication
 public class MusicplaylistApplication implements CommandLineRunner{
+	@Autowired
+	private MusicService musicService;
 	public static void main(String[] args) {
 		SpringApplication.run(MusicplaylistApplication.class, args);
 	}
@@ -38,8 +41,40 @@ public class MusicplaylistApplication implements CommandLineRunner{
 		Scanner keyboard = new Scanner(System.in);
 
 		// Asks the user for the chosen track
-		System.out.println();
-		System.out.print( "Choose track: " );
+		System.out.print( "\nChoose track: " );
+		byte user = keyboard.nextByte();
+		keyboard.close();
+		MusicDTO track = new MusicDTO (items.get( user - 1 ) );
+
+		// Save information on the database
+		try {
+			musicService.createMusic(track);
+		} catch( DataIntegrityViolationException e ) {
+			System.out.println("\n MUSIC ALREADY IN DATABASE!\n");
+		}
+		// Read information
+		MusicDTO music = musicService.readMusic((long) 1);
+		System.out.println("\n" + music.getName() + "\n");
+	}
+
+	public void testDTOEntityConstructors() {
+		var apiConsumption = new ApiConsumption();
+
+		// Searches a track named "savior" and receives 10 results  
+		TrackSearchResult trackResult = apiConsumption.trackRequest( "Kingslayer" );
+		List<MusicEntity> items = trackResult.getPlaylist().getMusic();
+		// Print the results
+		try {
+			items.forEach( item -> System.out.println( ( items.indexOf( item ) + 1 ) + " - " + item.getName() + 
+											" - " + item.getArtists().get(0).getName() ) );
+		} catch ( IndexOutOfBoundsException e ) {
+			System.out.println( "Index out of bounds" );
+		}
+		
+		Scanner keyboard = new Scanner(System.in);
+
+		// Asks the user for the chosen track
+		System.out.print( "\nChoose track: " );
 		byte user = keyboard.nextByte();
 		keyboard.close();
 		MusicDTO track = new MusicDTO(items.get( user - 1 ));
@@ -57,7 +92,7 @@ public class MusicplaylistApplication implements CommandLineRunner{
 			"\nName: " + trackEntity.getName() +
 			"\nArtist: " + trackEntity.getArtistsNames() +
 			"\nAlbum: " + trackEntity.getAlbumName() +
-			"\nDuration: " + trackEntity.getDuration_ms() );
+			"\nDuration: " + trackEntity.getDuration_ms() + "\n" );
 	}
 
 	public void testTrackSearch() throws Exception 

@@ -44,16 +44,10 @@ public class MusicplaylistApplication implements CommandLineRunner{
 		System.out.print( "\nChoose track: " );
 		byte user = keyboard.nextByte();
 		keyboard.close();
-		MusicDTO track = new MusicDTO (items.get( user - 1 ) );
+		MusicDTO track = new MusicDTO( items.get(user - 1) );
 
 		// Save information on the database
-		try {
-			musicService.createMusic(track);
-		} catch( DataIntegrityViolationException e ) {
-			System.out.println("\n MUSIC ALREADY IN DATABASE!\n");
-		}
-		// Read information
-		MusicDTO music = musicService.readMusic((long) 1);
+		MusicDTO music = musicService.createMusic(track);
 		System.out.println("\n" + music.getName() + "\n");
 	}
 

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.dao.DataIntegrityViolationException;
 
 import br.com.rogerio.Musicplaylist.dto.MusicDTO;
 import br.com.rogerio.Musicplaylist.entity.MusicEntity;
@@ -48,7 +47,10 @@ public class MusicplaylistApplication implements CommandLineRunner{
 
 		// Save information on the database
 		MusicDTO music = musicService.createMusic(track);
-		System.out.println("\n" + music.getName() + "\n");
+		System.out.println("\n" + music.getName() + "\nLiked: " + music.getLiked() + "\n");
+		music.setLiked(!music.getLiked());
+		music = musicService.updateMusic(music);
+		System.out.println("\n" + music.getName() + "\nLiked: " + music.getLiked() + "\n");
 	}
 
 	public void testDTOEntityConstructors() {

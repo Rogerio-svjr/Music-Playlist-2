@@ -1,4 +1,5 @@
 package br.com.rogerio.Musicplaylist.entity;
+import br.com.rogerio.Musicplaylist.dto.MusicDTO;
 import br.com.rogerio.Musicplaylist.dto.PlaylistDTO;
 
 import java.util.List;
@@ -23,21 +24,21 @@ public class PlaylistEntity {
 
   @JsonProperty("items")
   @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL)
-  private List<MusicEntity> music;
+  private List<MusicEntity> playlist;
   
   // Constructors
   public PlaylistEntity( PlaylistDTO playlist ){
     // BeanUtils.copyProperties(playlist, this);
     this.id = playlist.getId();
     this.name = playlist.getName();
-    this.music = playlist.getMusic().stream().map(MusicEntity::new).toList();
+    this.playlist = playlist.getPlaylist().stream().map(MusicEntity::new).toList();
   }
   public PlaylistEntity(){
   }
 
   // Getters
-  public List<MusicEntity> getMusic() {
-    return music;
+  public List<MusicEntity> getPlaylist() {
+    return playlist;
   }
   public Long getId() {
     return id;
@@ -45,7 +46,12 @@ public class PlaylistEntity {
   public String getName() {
     return name;
   }
+
+  // Setters
   public void setName(String name) {
     this.name = name;
+  }
+  public void setPlaylist(List<MusicEntity> music) {
+    this.playlist = music;
   }
 }

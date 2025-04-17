@@ -1,10 +1,8 @@
 package br.com.rogerio.Musicplaylist.entity;
-import br.com.rogerio.Musicplaylist.dto.MusicDTO;
 import br.com.rogerio.Musicplaylist.dto.PlaylistDTO;
 
+import java.util.ArrayList;
 import java.util.List;
-
-// import org.springframework.beans.BeanUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "playlist")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlaylistEntity {
   // Class properties
@@ -23,22 +22,29 @@ public class PlaylistEntity {
   private String name;
 
   @JsonProperty("items")
-  @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL)
-  private List<MusicEntity> playlist;
+  // @OneToMany(mappedBy = "playlist", cascade = CascadeType.MERGE)
+  @ManyToMany
+  @JoinTable(
+    name = "playlist_music", // intermediary table
+    joinColumns = @JoinColumn(name = "playlist_id"),
+    inverseJoinColumns = @JoinColumn(name = "music_id")
+  )
+  private List<MusicEntity> musics = new ArrayList<>();
   
   // Constructors
+  public PlaylistEntity(){}
   public PlaylistEntity( PlaylistDTO playlist ){
-    // BeanUtils.copyProperties(playlist, this);
     this.id = playlist.getId();
     this.name = playlist.getName();
-    this.playlist = playlist.getPlaylist().stream().map(MusicEntity::new).toList();
-  }
-  public PlaylistEntity(){
+    if ( playlist.getMusics() != null ) {
+      this.musics = playlist.getMusics().stream()
+        .map(MusicEntity::new).toList();
+    }
   }
 
   // Getters
-  public List<MusicEntity> getPlaylist() {
-    return playlist;
+  public List<MusicEntity> getMusics() {
+    return musics;
   }
   public Long getId() {
     return id;
@@ -51,7 +57,7 @@ public class PlaylistEntity {
   public void setName(String name) {
     this.name = name;
   }
-  public void setPlaylist(List<MusicEntity> music) {
-    this.playlist = music;
+  public void setMusics(List<MusicEntity> music) {
+    this.musics = new ArrayList<>(music);
   }
 }

@@ -1,9 +1,8 @@
 package br.com.rogerio.Musicplaylist.dto;
 import br.com.rogerio.Musicplaylist.entity.PlaylistEntity;
 
+import java.util.ArrayList;
 import java.util.List;
-
-// import org.springframework.beans.BeanUtils;
 
 public class PlaylistDTO {
   // Class properteies
@@ -11,16 +10,17 @@ public class PlaylistDTO {
 
   private String name;
 
-  private List<MusicDTO> playlist;
+  private List<MusicDTO> musics = new ArrayList<>();
 
   // Constructors
+  public PlaylistDTO() {}
   public PlaylistDTO( PlaylistEntity playlist ){
-    // BeanUtils.copyProperties(playlist, this);
     this.id = playlist.getId();
     this.name = playlist.getName();
-    this.playlist = playlist.getPlaylist().stream().map(MusicDTO::new).toList();
-  }
-  public PlaylistDTO() {
+    if (playlist.getMusics() != null) {
+      this.musics = playlist.getMusics().stream()
+        .map(MusicDTO::new).toList();
+    }
   }
 
   // Getters
@@ -30,25 +30,25 @@ public class PlaylistDTO {
   public String getName() {
     return name;
   }
-  public List<MusicDTO> getPlaylist() {
-    return playlist;
+  public List<MusicDTO> getMusics() {
+    return musics;
   }
 
   // Setters
   public void setName(String name) {
     this.name = name;
   }
-  public void setPlaylist(List<MusicDTO> music) {
-    this.playlist = music;
+  public void setMusics(List<MusicDTO> music) {
+    this.musics = new ArrayList<>(music);
   }
 
   // Methods
   public void addMusic( MusicDTO music ) {
-    this.playlist.add(music);
+    this.musics.add( music );
   }
 
   public void listMusics() {
-    this.playlist.forEach(music -> System.out.println(
+    this.musics.forEach(music -> System.out.println(
       music.getName() + " - " + music.getArtistsNames() ));
     System.out.println();
   }

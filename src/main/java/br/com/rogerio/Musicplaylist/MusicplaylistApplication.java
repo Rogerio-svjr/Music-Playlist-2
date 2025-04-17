@@ -14,11 +14,14 @@ import br.com.rogerio.Musicplaylist.entity.MusicEntity;
 import br.com.rogerio.Musicplaylist.entity.TrackSearchResult;
 import br.com.rogerio.Musicplaylist.service.ApiConsumption;
 import br.com.rogerio.Musicplaylist.service.MusicService;
+import br.com.rogerio.Musicplaylist.service.PlaylistService;
 
 @SpringBootApplication
 public class MusicplaylistApplication implements CommandLineRunner{
 	@Autowired
 	private MusicService musicService;
+	@Autowired
+	private PlaylistService playlistService;
 	
 	public static void main(String[] args) {
 		SpringApplication.run(MusicplaylistApplication.class, args);
@@ -29,8 +32,8 @@ public class MusicplaylistApplication implements CommandLineRunner{
 		var apiConsumption = new ApiConsumption();
 
 		// Searches a track named "savior" and receives 10 results  
-		TrackSearchResult trackResult = apiConsumption.trackRequest( "Kingslayer" );
-		List<MusicEntity> items = trackResult.getPlaylist().getPlaylist();
+		TrackSearchResult trackResult = apiConsumption.trackRequest( "Bleed it Out" );
+		List<MusicEntity> items = trackResult.getPlaylist().getMusics();
 		// Print the results
 		try {
 			items.forEach( item -> System.out.println( ( items.indexOf( item ) + 1 ) + " - " + item.getName() + 
@@ -47,26 +50,53 @@ public class MusicplaylistApplication implements CommandLineRunner{
 		keyboard.close();
 		MusicDTO track = new MusicDTO( items.get(user - 1) );
 
-		// Save data on the database (testing Create)
+		// TESTING CRUD OPERATIONS
+
+		// Save music on the database (testing Create)
 		MusicDTO music = musicService.createMusic(track);
 		System.out.println("\nCREATE:\n" + music.getName() + "\nLiked: " + music.getLiked() + "\n");
-		// Read data from the database (testing Read) 
+		// Read musics from the database (testing Read) 
 		PlaylistDTO playlist = new PlaylistDTO();
-		playlist.setPlaylist( musicService.readAllMusic() );
+		playlist.setMusics( musicService.readAllMusic() );
 		System.out.println("\nREAD ALL:");
 		playlist.listMusics();
-		music = musicService.readMusicById( (long) 2 );
+		music = musicService.readMusicById( music.getId() );
 		System.out.println("\nREAD ONE:\n" + music.getName() + " - " + music.getArtistsNames() + "\n");
-		// Modify data on database (testing Update)
+		// Modify musics on database (testing Update)
 		music.setLiked(!music.getLiked());
 		music = musicService.updateMusic(music);
 		System.out.println("\nUPDATE:\n" + music.getName() + "\nLiked: " + music.getLiked() + "\n");
-		// Delete data from database (testing Delete)
+		// Delete musics from database (testing Delete)
 		Long id = music.getId();
 		musicService.deleteMusic(id);
-		playlist.setPlaylist( musicService.readAllMusic() );
+		playlist.setMusics( musicService.readAllMusic() );
 		System.out.println("\nDELETE:");
 		playlist.listMusics();
+		
+		// Save playlist on the database (testing create)
+		PlaylistDTO rock = new PlaylistDTO();
+		rock.setName("Rock");
+		rock = playlistService.createPlaylist(rock);
+		System.out.println("\nCREATE:\n" + rock.getName() + "\n");
+		// Read playlist from database
+		List<PlaylistDTO> playlistList;
+		playlistList = playlistService.readAllPlaylists();
+		System.out.println("\nREAD ALL:");
+		playlistList.forEach(list -> System.out.println(list.getName() + " - " + list.getMusics().size()));
+		System.out.println();
+		// Update playlist from database
+		playlist.addMusic(track);
+		rock.setMusics(playlist.getMusics());
+		rock.setName("Indie");
+		rock = playlistService.updatePlaylist(rock);
+		PlaylistDTO indie = playlistService.readPlaylistById(rock.getId());
+		System.out.println("\nREAD ONE and UPDATE:\n" + indie.getName());
+		indie.listMusics();
+		// Delete playlist from database
+		System.out.println("\nDELETE:");
+		playlistService.deletePlaylist(indie.getId());
+		playlistList = playlistService.readAllPlaylists();
+		playlistList.forEach(list -> System.out.println(list.getName() + " - " + list.getMusics().size()));
 	}
 
 	public void testDTOEntityMusicConstructors() {
@@ -74,7 +104,7 @@ public class MusicplaylistApplication implements CommandLineRunner{
 
 		// Searches a track named "savior" and receives 10 results  
 		TrackSearchResult trackResult = apiConsumption.trackRequest( "Kingslayer" );
-		List<MusicEntity> items = trackResult.getPlaylist().getPlaylist();
+		List<MusicEntity> items = trackResult.getPlaylist().getMusics();
 		// Print the results
 		try {
 			items.forEach( item -> System.out.println( ( items.indexOf( item ) + 1 ) + " - " + item.getName() + 
@@ -113,7 +143,7 @@ public class MusicplaylistApplication implements CommandLineRunner{
 
 		// Searches a track named "savior" and receives 10 results 
 		TrackSearchResult trackResult = apiConsumption.trackRequest( "Savior" );
-		List<MusicEntity> items = trackResult.getPlaylist().getPlaylist();
+		List<MusicEntity> items = trackResult.getPlaylist().getMusics();
 		// Print the results
 		try {
 			items.forEach( item -> System.out.println( item.getName() + " - " + item.getArtists().get(0).getName() ) );
@@ -123,7 +153,7 @@ public class MusicplaylistApplication implements CommandLineRunner{
 
 		// Searches and prints the next 10 results
 		trackResult = apiConsumption.nextTrackRequestPage();
-		items = trackResult.getPlaylist().getPlaylist();
+		items = trackResult.getPlaylist().getMusics();
 		System.out.println();
 		try {
 			items.forEach( item -> System.out.println( item.getName() + " - " + item.getArtists().get(0).getName() ) );
@@ -133,7 +163,7 @@ public class MusicplaylistApplication implements CommandLineRunner{
 
 		// Searches previous 10 results again 
 		trackResult = apiConsumption.previousTrackRequestPage();
-		items = trackResult.getPlaylist().getPlaylist();
+		items = trackResult.getPlaylist().getMusics();
 		System.out.println();
 		try {
 			items.forEach( item -> System.out.println( item.getName() + " - " + item.getArtists().get(0).getName() ) );

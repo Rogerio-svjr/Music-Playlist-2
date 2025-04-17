@@ -1,6 +1,7 @@
 package br.com.rogerio.Musicplaylist.entity;
 import br.com.rogerio.Musicplaylist.dto.MusicDTO;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,7 +13,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(
-	name = "music_entity",
+	name = "music",
 	uniqueConstraints = {
 		@UniqueConstraint(columnNames = {"name", "artistsNames"})
 	}
@@ -42,13 +43,15 @@ public class MusicEntity {
 	@Column(nullable = false)
 	private int duration_ms;
 
-	@ManyToOne
-	@JoinColumn(name = "playlist_id")
-	private PlaylistEntity playlist;
+	// @ManyToOne
+	// @JoinColumn(name = "playlist_id")
+	@ManyToMany(mappedBy = "musics") // inverse side
+	private List<PlaylistEntity> playlist = new ArrayList<>();
 
 	private boolean liked = false;
 
 	//Constructors
+	public MusicEntity() {}
 	public MusicEntity( MusicDTO music ){
 		this.id = music.getId();
     this.name = music.getName();
@@ -57,13 +60,11 @@ public class MusicEntity {
 		this.album = new Album(music.getAlbum());
 		this.albumName = this.getAlbumName();
 		this.duration_ms = (int) music.getDuration_s() * 1000;
-		try {
-			this.playlist = new PlaylistEntity( music.getPlaylist() );
-		} catch( NullPointerException e ) {
+		if ( music.getPlaylist() != null ) {
+			this.playlist = music.getPlaylist().stream()
+				.map(PlaylistEntity::new).toList();
 		}
 		this.liked = music.getLiked();
-	}
-	public MusicEntity() {
 	}
 
 	//Getters
@@ -74,11 +75,14 @@ public class MusicEntity {
 		return name;
 	}
 	public List<Artist> getArtists() {
-		if( this.artists == null && this.artistsNames != null) {
+		// If the entity came from the db, the Artist property would be null
+		if ( this.artists == null && this.artistsNames != null) {
 			this.artists = Arrays.stream(artistsNames.split(","))
 				.map(String::trim)
 				.map(Artist::new)
 				.toList();
+		} else if ( this.artists == null && this.artistsNames == null ){
+			this.artists = new ArrayList<>();
 		}
 		return artists;
 	}
@@ -87,7 +91,8 @@ public class MusicEntity {
 		return artistsList.stream().collect(Collectors.joining(", "));
 	}
 	public Album getAlbum() {
-		if( this.album == null && this.albumName != null ) {
+		// If the entity came from the db, the Album property would be null
+		if ( this.album == null && this.albumName != null ) {
 			this.album = new Album(albumName);
 		}
 		return album;
@@ -98,15 +103,15 @@ public class MusicEntity {
 	public int getDuration_ms() {
 		return duration_ms;
 	}
-	public PlaylistEntity getPlaylist() {
+	public List<PlaylistEntity> getPlaylist() {
 		return playlist;
 	}
 	public boolean getLiked() {
 		return liked;
 	}
 
-	//Setters
-	public void setPlaylist(PlaylistEntity playlist) {
+	// Setters
+	public void setPlaylist(List<PlaylistEntity> playlist) {
 		this.playlist = playlist;
 	}
 	public void setLiked(boolean liked) {

@@ -2,6 +2,7 @@ package br.com.rogerio.Musicplaylist.dto;
 import br.com.rogerio.Musicplaylist.entity.Artist;
 import br.com.rogerio.Musicplaylist.entity.MusicEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,24 +18,22 @@ public class MusicDTO {
   
 	private float duration_s;
   
-	private PlaylistDTO playlist;
+	private List<PlaylistDTO> playlist = new ArrayList<>();
 
   private boolean liked;
 
   // Constructors
+  public MusicDTO() {}
   public MusicDTO( MusicEntity music ) {
     this.id = music.getId();
     this.name = music.getName();
     this.artistsList = music.getArtists().stream().map(Artist::getName).toList();
     this.album = music.getAlbumName();
     this.duration_s = music.getDuration_ms() / 1000;
-    try {
-      this.playlist = new PlaylistDTO( music.getPlaylist() );
-    } catch( NullPointerException e ) {
-    }
+    // if ( music.getPlaylist() != null ) {
+    //   this.playlist = music.getPlaylist().stream().map(PlaylistDTO::new).toList();
+    // }
     this.liked = music.getLiked();
-  }
-  public MusicDTO() {
   }
 
   // Getters
@@ -53,7 +52,7 @@ public class MusicDTO {
   public float getDuration_s() {
     return duration_s;
   }
-  public PlaylistDTO getPlaylist() {
+  public List<PlaylistDTO> getPlaylist() {
     return playlist;
   }
   public boolean getLiked() {
@@ -61,8 +60,8 @@ public class MusicDTO {
   }
 
   //Setters
-	public void setPlaylist(PlaylistDTO playlist) {
-		this.playlist = playlist;
+	public void setPlaylist(List<PlaylistDTO> playlist) {
+		this.playlist = new ArrayList<>(playlist);
 	}
 	public void setLiked(boolean liked) {
 		this.liked = liked;

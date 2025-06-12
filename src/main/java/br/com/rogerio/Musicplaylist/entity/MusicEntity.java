@@ -75,7 +75,7 @@ public class MusicEntity {
 		return name;
 	}
 	public List<Artist> getArtists() {
-		// If the entity came from the db, the Artist property would be null
+		// If the entity came from the db, the Artist field would be null
 		if ( this.artists == null && this.artistsNames != null) {
 			this.artists = Arrays.stream(artistsNames.split(","))
 				.map(String::trim)
@@ -87,11 +87,12 @@ public class MusicEntity {
 		return artists;
 	}
 	public String getArtistsNames(){
+		// Concatenates all artists names in a single string
 		List<String> artistsList = this.getArtists().stream().map(Artist::getName).toList();
 		return artistsList.stream().collect(Collectors.joining(", "));
 	}
 	public Album getAlbum() {
-		// If the entity came from the db, the Album property would be null
+		// If the entity came from the db, the Album field would be null
 		if ( this.album == null && this.albumName != null ) {
 			this.album = new Album(albumName);
 		}

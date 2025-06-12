@@ -27,10 +27,6 @@ public class MusicService {
     this.musicRepository = musicRepository;
     this.playlistRepository = playlistRepository;
   }
-  // public MusicService( MusicRepository musicRepository ) {
-  //   this.musicRepository = musicRepository;
-  // }
-  
 
   // Create
   @Transactional

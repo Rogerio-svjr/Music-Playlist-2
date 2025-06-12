@@ -30,9 +30,6 @@ public class MusicDTO {
     this.artistsList = music.getArtists().stream().map(Artist::getName).toList();
     this.album = music.getAlbumName();
     this.duration_s = music.getDuration_ms() / 1000;
-    // if ( music.getPlaylist() != null ) {
-    //   this.playlist = music.getPlaylist().stream().map(PlaylistDTO::new).toList();
-    // }
     this.liked = music.getLiked();
   }
 

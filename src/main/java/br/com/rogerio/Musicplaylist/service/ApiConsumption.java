@@ -22,7 +22,8 @@ public class ApiConsumption {
 	private AccessToken tokenRequest() {
 		// Request body from a String
 		String bodyStr = "grant_type=client_credentials";
-		String originalAuth = "a4579528d58b40568d2f86713eeb7144:ef424bd474bd489faf1d3831cc6f1f43";
+		// Spotify "clinet_id":"client_secret" (most not be revealed)
+		String originalAuth = "a4579528d58b40568d2f86713eeb7144:ef424bd474bd489faf1d3831cc6f1f43"; 
 		String encodedAutho = Base64.getEncoder().encodeToString( originalAuth.getBytes() );
 
 		// POST request
@@ -54,7 +55,7 @@ public class ApiConsumption {
 			.uri( URI.create( "https://api.spotify.com/v1/search?q=" + trackName + "&type=track&limit=10&offset=" + searchOffset ) )
 			.header( "Authorization", "Bearer " + accessToken )
 			.build();
-			
+
 		HttpResponse<String> responseGET = null;
 		
 		try {

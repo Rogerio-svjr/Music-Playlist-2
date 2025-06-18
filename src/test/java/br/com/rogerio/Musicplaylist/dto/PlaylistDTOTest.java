@@ -14,13 +14,14 @@ import br.com.rogerio.Musicplaylist.entity.PlaylistEntity;
 
 public class PlaylistDTOTest {
   @Test
-  public void testConstructorFromAPI() {
-    // Creates a mock entities
+  public void testConstructor_PlaylistEntityCameFromAPI_ShouldNotHaveNameAndId() {
+    // Creates mock entities
     PlaylistEntity mockPlaylistEntity = Mockito.mock(PlaylistEntity.class);
     MusicEntity mockMusicEntity1 = Mockito.mock(MusicEntity.class);
     MusicEntity mockMusicEntity2 = Mockito.mock(MusicEntity.class);
-    // Defines mocks behavior
+    // Define mocks behavior
     Mockito.when(mockPlaylistEntity.getMusics()).thenReturn(List.of(mockMusicEntity1, mockMusicEntity2));
+    Mockito.when(mockPlaylistEntity.getId()).thenReturn(null);
     Mockito.when(mockMusicEntity1.getAlbumName()).thenReturn("A1");
     Mockito.when(mockMusicEntity2.getAlbumName()).thenReturn("A2");
     Mockito.when(mockMusicEntity1.getName()).thenReturn("Music 1");
@@ -33,13 +34,14 @@ public class PlaylistDTOTest {
     PlaylistDTO playlistDTO = new PlaylistDTO(mockPlaylistEntity);
 
     assertNull( playlistDTO.getName() );
+    assertNull( playlistDTO.getId() );
     assertNotNull( playlistDTO.getMusics() );
     assertEquals( expectedMusicList.get(0).getName(), playlistDTO.getMusics().get(0).getName() );
     assertEquals( expectedMusicList.get(1).getName(), playlistDTO.getMusics().get(1).getName() );
   }
   
   @Test
-  public void testConstructorFromDB() {
+  public void testConstructor_PlaylistEntityCameFromDB_ShouldHaveNameAndId() {
     // Creates a mock entities
     PlaylistEntity mockPlaylistEntity = Mockito.mock(PlaylistEntity.class);
     // Defines mocks behavior
@@ -50,5 +52,30 @@ public class PlaylistDTOTest {
 
     assertEquals( 1L, playlistDTO.getId() );
     assertEquals("Test Playlist", playlistDTO.getName());
+  }
+
+  @Test
+  public void testAddMusic_MusicIsAddedToPlaylist_shouldAddNewMusic() {
+    // Prepare test
+    PlaylistDTO testPlaylist = new PlaylistDTO();
+    MusicDTO mockMusic = Mockito.mock(MusicDTO.class);
+    Mockito.when(mockMusic.getName()).thenReturn("Test Music");
+    // Test addMusic
+    testPlaylist.addMusic(mockMusic);
+
+    assertEquals("Test Music", testPlaylist.getMusics().get(0).getName());
+  }
+  
+  @Test
+  public void testAddMusic_AddingRepeatedMusic_ShouldNotAdd() {
+    // Prepare test
+    PlaylistDTO testPlaylist = new PlaylistDTO();
+    MusicDTO mockMusic = Mockito.mock(MusicDTO.class);
+    Mockito.when(mockMusic.getId()).thenReturn(1L);
+    // Test adding music twice
+    testPlaylist.addMusic(mockMusic);
+    testPlaylist.addMusic(mockMusic);
+
+    assertEquals(1, testPlaylist.getMusics().size());
   }
 }

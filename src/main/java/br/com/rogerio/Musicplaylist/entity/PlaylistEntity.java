@@ -36,10 +36,8 @@ public class PlaylistEntity {
   public PlaylistEntity( PlaylistDTO playlist ){
     this.id = playlist.getId();
     this.name = playlist.getName();
-    if ( playlist.getMusics() != null ) {
-      this.musics = playlist.getMusics().stream()
-        .map(MusicEntity::new).toList();
-    }
+    this.musics = playlist.getMusics().stream()
+      .map(MusicEntity::new).toList();
   }
 
   // Getters

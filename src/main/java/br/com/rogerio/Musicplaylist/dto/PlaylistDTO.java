@@ -44,6 +44,12 @@ public class PlaylistDTO {
 
   // Methods
   public void addMusic( MusicDTO music ) {
+    // Check if music is in the playlist already
+    for( MusicDTO musicInPlaylist : this.musics ) {
+      if( musicInPlaylist.getId().equals(music.getId()) ) {
+        return;
+      }
+    }
     this.musics.add( music );
   }
 

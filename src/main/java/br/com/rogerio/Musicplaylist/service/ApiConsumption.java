@@ -51,10 +51,10 @@ public class ApiConsumption {
 		String accessToken = token.accessToken().replace(" ", "+");
 		
 		HttpRequest requestTrack = HttpRequest.newBuilder()
-		.uri( URI.create( "https://api.spotify.com/v1/search?q=" + trackName + "&type=track&limit=10&offset=" + searchOffset ) )
-		.header( "Authorization", "Bearer " + accessToken )
-		.build();
-		
+			.uri( URI.create( "https://api.spotify.com/v1/search?q=" + trackName + "&type=track&limit=10&offset=" + searchOffset ) )
+			.header( "Authorization", "Bearer " + accessToken )
+			.build();
+			
 		HttpResponse<String> responseGET = null;
 		
 		try {

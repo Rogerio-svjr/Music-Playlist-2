@@ -58,7 +58,7 @@ public class MusicEntity {
 		this.artists = music.getArtistsList().stream().map(Artist::new).toList();
 		this.artistsNames = this.getArtistsNames();
 		this.album = new Album(music.getAlbum());
-		this.albumName = this.getAlbumName();
+		this.albumName = this.getAlbum().getName();
 		this.duration_ms = (int) music.getDuration_s() * 1000;
 		if ( music.getPlaylist() != null ) {
 			this.playlist = music.getPlaylist().stream()
@@ -75,7 +75,7 @@ public class MusicEntity {
 		return name;
 	}
 	public List<Artist> getArtists() {
-		// If the entity came from the db, the Artist field would be null
+		// If the entity came from the DB, the Artist field would be null
 		if ( this.artists == null && this.artistsNames != null) {
 			this.artists = Arrays.stream(artistsNames.split(","))
 				.map(String::trim)
@@ -87,19 +87,26 @@ public class MusicEntity {
 		return artists;
 	}
 	public String getArtistsNames(){
-		// Concatenates all artists names in a single string
-		List<String> artistsList = this.getArtists().stream().map(Artist::getName).toList();
-		return artistsList.stream().collect(Collectors.joining(", "));
+		// If the entity came from the API the artistsNames field would be null
+		if ( this.artists != null && this.artistsNames == null ) {
+			List<String> artistsList = this.getArtists().stream().map(Artist::getName).toList();
+			this.artistsNames = artistsList.stream().collect(Collectors.joining(", "));
+		}
+		return artistsNames;
 	}
 	public Album getAlbum() {
-		// If the entity came from the db, the Album field would be null
+		// If the entity came from the DB, the album field would be null
 		if ( this.album == null && this.albumName != null ) {
 			this.album = new Album(albumName);
 		}
 		return album;
 	}
 	public String getAlbumName(){
-		return this.getAlbum().getName();
+		// If the entity came from API, the albumName field would be null
+		if ( this.album != null && this.albumName == null ) {
+			this.albumName = this.album.getName();
+		}
+		return albumName;
 	}
 	public int getDuration_ms() {
 		return duration_ms;

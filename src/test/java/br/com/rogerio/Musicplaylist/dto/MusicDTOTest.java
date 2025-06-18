@@ -15,8 +15,8 @@ import br.com.rogerio.Musicplaylist.entity.MusicEntity;
 
 public class MusicDTOTest {
   @Test
-  public void testConstructorFromAPI() {
-    // Creates the mocked object
+  public void testConstructor_MusicEntityCameFromAPI_ShouldNotHaveId() {
+    // Creates a mock object
     MusicEntity mockMusicEntity = Mockito.mock(MusicEntity.class);
     // Defines the expected mocked object behavior
     Mockito.when(mockMusicEntity.getId()).thenReturn( null );
@@ -25,7 +25,7 @@ public class MusicDTOTest {
     Mockito.when(mockMusicEntity.getAlbumName()).thenReturn("Test Album");
     Mockito.when(mockMusicEntity.getDuration_ms()).thenReturn(185000);
     Mockito.when(mockMusicEntity.getLiked()).thenReturn(false);
-    // Create expected Artist list
+    // Creates expected Artist list
     List<String> artistsList = List.of("A1", "A2");
     // Test constructor
     MusicDTO musicDTO = new MusicDTO(mockMusicEntity);
@@ -39,8 +39,8 @@ public class MusicDTOTest {
   }
   
   @Test
-  public void testConstructorFromDB() {
-    // Creates the mocked object
+  public void testConstructor_MusicEntityCameFromDB_ShouldHaveId() {
+    // Creates a mock object
     MusicEntity mockMusicEntity = Mockito.mock(MusicEntity.class);
     // Defines the expected mocked object behavior
     Mockito.when(mockMusicEntity.getId()).thenReturn( 1L );
@@ -49,7 +49,7 @@ public class MusicDTOTest {
     Mockito.when(mockMusicEntity.getAlbumName()).thenReturn("Test Album");
     Mockito.when(mockMusicEntity.getDuration_ms()).thenReturn(185000);
     Mockito.when(mockMusicEntity.getLiked()).thenReturn(true);
-    // Create expected Artist list
+    // Creates expected Artist list
     List<String> artistsList = List.of("A1", "A2");
     // Test constructor
     MusicDTO musicDTO = new MusicDTO(mockMusicEntity);
@@ -63,8 +63,8 @@ public class MusicDTOTest {
   }
 
   @Test
-  public void TestConstructorShouldNotConvertPlaylist() {
-    // Creates the mocked object
+  public void TestConstructor_PlaylistIsSettedManually_ShouldNotConvertPlaylist() {
+    // Creates a mock object
     MusicEntity mockMusicEntity = Mockito.mock(MusicEntity.class);
     // Defines the expected mocked object behavior
     Mockito.when(mockMusicEntity.getId()).thenReturn( 1L );
@@ -106,7 +106,7 @@ public class MusicDTOTest {
   }
 
   @Test
-  public void testGetArtistsNamesShouldReturnASingleString() {
+  public void testGetArtistsNames_WithTwoArtists_ShouldReturnASingleStringSeparatedByComasAndSpace() {
     // Creates a mock entity
     MusicEntity mockMusicEntity = Mockito.mock(MusicEntity.class);
     // Defines the mock entity behavior
@@ -120,7 +120,7 @@ public class MusicDTOTest {
   }
   
   @Test
-  public void testGetArtistsNamesShouldNotReturnAStringWithoutSpaces() {
+  public void testGetArtistsNames_WithTwoArtists_ShouldNotReturnAStringWithoutSpaces() {
     // Creates a mock entity
     MusicEntity mockMusicEntity = Mockito.mock(MusicEntity.class);
     // Defines the mock entity behavior
@@ -134,7 +134,7 @@ public class MusicDTOTest {
   }
   
   @Test
-  public void testGetArtistsNamesShouldNotReturnAStringWithoutComas() {
+  public void testGetArtistsNames_WithTwoArtists_ShouldNotReturnAStringWithoutComas() {
     // Creates a mock entity
     MusicEntity mockMusicEntity = Mockito.mock(MusicEntity.class);
     // Defines the mock entity behavior
@@ -148,7 +148,7 @@ public class MusicDTOTest {
   }
   
   @Test
-  public void testGetArtistsNamesShouldNotReturnAStringWithoutSpacesAndComas() {
+  public void testGetArtistsNames_WithTwoArtists_ShouldNotReturnAStringWithoutSpacesAndComas() {
     // Creates a mock entity
     MusicEntity mockMusicEntity = Mockito.mock(MusicEntity.class);
     // Defines the mock entity behavior
@@ -176,7 +176,7 @@ public class MusicDTOTest {
   }
   
   @Test
-  public void testGetDuration_minShouldNotHaveTwoDigits() {
+  public void testGetDuration_min_MinutesShouldNotHaveTwoDigits() {
     // Creates a mock entity
     MusicEntity mockMusicEntity = Mockito.mock(MusicEntity.class);
     // Defines the mocked music duration to 3 min 10 s
@@ -190,7 +190,7 @@ public class MusicDTOTest {
   }
   
   @Test
-  public void testGetDuration_minMaxValue() {
+  public void testGetDuration_min_PassingMaxValue_ShouldReturn35791MinAnd22S() {
     // Creates a mock entity
     MusicEntity mockMusicEntity = Mockito.mock(MusicEntity.class);
     // Defines the mocked music duration to integer maximum value (2^31-1)
@@ -198,13 +198,13 @@ public class MusicDTOTest {
     MusicDTO musicDTO = new MusicDTO(mockMusicEntity);
 
     String actual = musicDTO.getDuration_min();
-    String Expected = "35791:22";
+    String expected = "35791:22";
 
-    assertEquals(Expected, actual);
+    assertEquals(expected, actual);
   }
   
   @Test
-  public void testGetDuration_minMinValue() {
+  public void testGetDuration_min_PassingMinValue_ShouldReturnMinus35791MinAndMinus22S() {
     // Creates a mock entity
     MusicEntity mockMusicEntity = Mockito.mock(MusicEntity.class);
     // Defines the mocked music duration to integer maximum value (2^31-1)

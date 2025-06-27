@@ -33,16 +33,20 @@ public class MusicService {
   public MusicDTO createMusic( MusicDTO music ) {
     // Check if music is already on the database
     MusicEntity musicEntity = new MusicEntity(music);
+    System.out.println("entity id: " + musicEntity.getId());
     ExampleMatcher matcher = ExampleMatcher.matching()
-    .withIgnorePaths("liked", "playlist");
+    .withIgnorePaths("liked", "playlist", "playlists");
+    // System.out.println("Before matcher...");
     Example<MusicEntity> example = Example.of(musicEntity, matcher);
+    // System.out.println("After matcher. Before findOne...");
     Optional<MusicEntity> result = musicRepository.findOne(example);
+    // System.out.println("After findOne...");
     // If it is, returns it. If not, creates it.
     if( result.isPresent() ) {
-      // System.out.println("\nMUSIC ALREADY IN DATABASE!\n");
+      System.out.println("\nMUSIC ALREADY IN DATABASE!\n");
       return new MusicDTO( result.get() );
     } else {
-      // System.out.println("\nmusic put into databse: " + music.getName() + "\n");
+      System.out.println("\nmusic put into databse: " + music.getName() + "\n");
       return new MusicDTO( musicRepository.save(musicEntity) );
     }
   }

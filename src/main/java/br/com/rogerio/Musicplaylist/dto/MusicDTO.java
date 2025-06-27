@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class MusicDTO {
-  // Class properties
+  // Class field
   private Long id;
 	
 	private String name;

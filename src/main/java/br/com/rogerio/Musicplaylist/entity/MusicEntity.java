@@ -60,7 +60,7 @@ public class MusicEntity {
 		this.album = new Album(music.getAlbum());
 		this.albumName = this.getAlbum().getName();
 		this.duration_ms = (int) music.getDuration_s() * 1000;
-		if ( music.getPlaylist() != null ) {
+		if ( !music.getPlaylist().isEmpty() ) {
 			this.playlist = music.getPlaylist().stream()
 				.map(PlaylistEntity::new).toList();
 		}

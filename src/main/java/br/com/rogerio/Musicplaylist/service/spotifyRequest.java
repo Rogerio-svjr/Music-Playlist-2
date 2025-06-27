@@ -9,15 +9,21 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Base64;
 
-import br.com.rogerio.Musicplaylist.entity.AccessToken;
+import br.com.rogerio.Musicplaylist.dto.AccessToken;
 import br.com.rogerio.Musicplaylist.entity.TrackSearchResult;
 
-public class ApiConsumption {
+public class spotifyRequest {
+	private AccessToken token;
+	String accessToken;
+
 	HttpClient client = HttpClient.newHttpClient();
+	
 	ConvertsData convertsData = new ConvertsData();
 
-	private byte searchOffset = 0;
+	private int searchOffset = 0;
 	private String currentTrackName = null;
+
+	// public ApiConsumption()
 
 	private AccessToken tokenRequest() {
 		// Request body from a String
@@ -42,37 +48,50 @@ public class ApiConsumption {
 			e.printStackTrace();
 		}
 
-		return convertsData.GetData( responsePOST.body(), AccessToken.class );
+		return convertsData.getData( responsePOST.body(), AccessToken.class );
 	}
 
 	public TrackSearchResult trackRequest( String trackName ) {
+		// Refactor the track name to fit in the url
 		trackName = trackName.replace(" ", "-");
 		currentTrackName = trackName;
-		AccessToken token = this.tokenRequest();
-		String accessToken = token.accessToken().replace(" ", "+");
-		
+		// Build the track request with uri and header
 		HttpRequest requestTrack = HttpRequest.newBuilder()
 			.uri( URI.create( "https://api.spotify.com/v1/search?q=" + trackName + "&type=track&limit=10&offset=" + searchOffset ) )
-			.header( "Authorization", "Bearer " + accessToken )
+			.header( "Authorization", "Bearer " + this.accessToken )
 			.build();
-
+		// Send the request and get the response
 		HttpResponse<String> responseGET = null;
-		
 		try {
 			responseGET = client.send( requestTrack, HttpResponse.BodyHandlers.ofString() );
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
-		
-		return convertsData.GetData( responseGET.body(), TrackSearchResult.class );
+		// Deserialize the resonse JSON string
+		TrackSearchResult result = convertsData.getData( responseGET.body(), TrackSearchResult.class );
+		// If the access token expired or is invalid the request response is an error 401,
+		// So the access token needs to be requested again
+		if ( result.getPlaylist() == null && result.getError() != null ) {
+			if ( result.getError().status() == 401 ) {
+				this.token = this.tokenRequest();
+				this.accessToken = token.accessToken().replace(" ", "+");
+				result = this.trackRequest(trackName);
+			}
+		} else if ( result.getPlaylist() != null ) {
+			result.setError(null);
+		}
+
+		return result;
 	}
 	
 	public TrackSearchResult nextTrackRequestPage( ) {
+		// Update the offset parameter in the request uri to request the next 10 tracks 
 		searchOffset += 10;
 		return this.trackRequest( currentTrackName );
 	}
-
+	
 	public TrackSearchResult previousTrackRequestPage( ) {
+		// Update the offset parameter in the request uri to request the previous 10 tracks 
 		searchOffset -= 10;
 		return this.trackRequest( currentTrackName );
 	}

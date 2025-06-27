@@ -12,7 +12,7 @@ import br.com.rogerio.Musicplaylist.dto.MusicDTO;
 import br.com.rogerio.Musicplaylist.dto.PlaylistDTO;
 import br.com.rogerio.Musicplaylist.entity.MusicEntity;
 import br.com.rogerio.Musicplaylist.entity.TrackSearchResult;
-import br.com.rogerio.Musicplaylist.service.ApiConsumption;
+import br.com.rogerio.Musicplaylist.service.spotifyRequest;
 import br.com.rogerio.Musicplaylist.service.MusicService;
 import br.com.rogerio.Musicplaylist.service.PlaylistService;
 
@@ -29,7 +29,7 @@ public class MusicplaylistApplication implements CommandLineRunner{
 
 	@Override
 	public void run( String... args ){
-		var apiConsumption = new ApiConsumption();
+		var apiConsumption = new spotifyRequest();
 
 		// Searches a track named "savior" and receives 10 results  
 		TrackSearchResult trackResult = apiConsumption.trackRequest( "Bleed it Out" );
@@ -100,7 +100,7 @@ public class MusicplaylistApplication implements CommandLineRunner{
 	}
 
 	public void testDTOEntityMusicConstructors() {
-		var apiConsumption = new ApiConsumption();
+		var apiConsumption = new spotifyRequest();
 
 		// Searches a track named "savior" and receives 10 results  
 		TrackSearchResult trackResult = apiConsumption.trackRequest( "Kingslayer" );
@@ -139,7 +139,7 @@ public class MusicplaylistApplication implements CommandLineRunner{
 
 	public void testTrackSearch() throws Exception 
   {
-		var apiConsumption = new ApiConsumption();
+		var apiConsumption = new spotifyRequest();
 
 		// Searches a track named "savior" and receives 10 results 
 		TrackSearchResult trackResult = apiConsumption.trackRequest( "Savior" );

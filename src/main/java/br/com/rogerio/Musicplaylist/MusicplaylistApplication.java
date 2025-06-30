@@ -57,19 +57,29 @@ public class MusicplaylistApplication implements CommandLineRunner{
 		System.out.println("\nCREATE:\n" + music.getName() + "\nLiked: " + music.getLiked() + "\n");
 		// Read musics from the database (testing Read) 
 		PlaylistDTO playlist = new PlaylistDTO();
-		playlist.setMusics( musicService.readAllMusic() );
+		try {
+			playlist.setMusics( musicService.readAllMusic() );
+		} catch (Exception e) {}
 		System.out.println("\nREAD ALL:");
 		playlist.listMusics();
-		music = musicService.readMusicById( music.getId() );
+		try {
+			music = musicService.readMusicById( music.getId() );
+		} catch (Exception e) {}
 		System.out.println("\nREAD ONE:\n" + music.getName() + " - " + music.getArtistsNames() + "\n");
 		// Modify musics on database (testing Update)
 		music.setLiked(!music.getLiked());
-		music = musicService.updateMusic(music);
+		try {
+			music = musicService.updateMusic(music);
+		} catch (Exception e) {}
 		System.out.println("\nUPDATE:\n" + music.getName() + "\nLiked: " + music.getLiked() + "\n");
 		// Delete musics from database (testing Delete)
 		Long id = music.getId();
-		musicService.deleteMusic(id);
-		playlist.setMusics( musicService.readAllMusic() );
+		try {
+			musicService.deleteMusic(id);
+		} catch (Exception e) {}
+		try {
+			playlist.setMusics( musicService.readAllMusic() );
+		} catch (Exception e) {}
 		System.out.println("\nDELETE:");
 		playlist.listMusics();
 		

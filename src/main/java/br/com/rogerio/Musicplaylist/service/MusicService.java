@@ -1,6 +1,7 @@
 package br.com.rogerio.Musicplaylist.service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,14 +34,10 @@ public class MusicService {
   public MusicDTO createMusic( MusicDTO music ) {
     // Check if music is already on the database
     MusicEntity musicEntity = new MusicEntity(music);
-    System.out.println("entity id: " + musicEntity.getId());
     ExampleMatcher matcher = ExampleMatcher.matching()
-    .withIgnorePaths("liked", "playlist", "playlists");
-    // System.out.println("Before matcher...");
+    .withIgnorePaths("liked", "playlist");
     Example<MusicEntity> example = Example.of(musicEntity, matcher);
-    // System.out.println("After matcher. Before findOne...");
     Optional<MusicEntity> result = musicRepository.findOne(example);
-    // System.out.println("After findOne...");
     // If it is, returns it. If not, creates it.
     if( result.isPresent() ) {
       System.out.println("\nMUSIC ALREADY IN DATABASE!\n");
@@ -53,39 +50,56 @@ public class MusicService {
 
   // Update
   @Transactional
-  public MusicDTO updateMusic( MusicDTO music ) {
+  public MusicDTO updateMusic( MusicDTO music ) throws Exception {
+    // Verify if the provided music has an id
+    if( music.getId() == null ) {
+      throw new Exception("Provided music without id");
+    }
+    // Verify if the provided music is on database
+    Optional<MusicEntity> opt = musicRepository.findById(music.getId());
+    if ( !opt.isPresent() ) {
+      throw new Exception("Provided music not found");
+    }
     MusicEntity musicEntity = new MusicEntity(music);
+    // Update music on database and returns it
     return new MusicDTO( musicRepository.save(musicEntity) );
   }
 
   // Read 
   @Transactional
-  public List<MusicDTO> readAllMusic() {
+  public List<MusicDTO> readAllMusic() throws Exception {
     List<MusicEntity> musics = musicRepository.findAll();
+    // Verify if the database is empty
+    if( musics.isEmpty() ) {
+      throw new Exception("No music in database");
+    }
+    // Returns a list of all present musics
     return musics.stream().map(MusicDTO::new).toList();
   }
   
   @Transactional
-  public MusicDTO readMusicById( Long id ) {
+  public MusicDTO readMusicById( Long id ) throws NoSuchElementException {
     return new MusicDTO( musicRepository.findById(id).get() );
   }
 
   // Delete
   @Transactional
-  public void deleteMusic( Long id ) {
-    // Check if music really exists
+  public void deleteMusic( Long id ) throws Exception {
+    // Check if music really exists and throws exception if not
     Optional<MusicEntity> musicOpt = musicRepository.findById(id);
-    if ( musicOpt.isPresent() ) {
-      MusicEntity music = musicOpt.get();
-      // Deletes it from all playlists that contains it
-      List<PlaylistEntity> playlists = playlistRepository.findAll();
-      playlists.forEach( playlist -> {
-        if ( playlist.getMusics().contains(music) ) {
-          playlist.getMusics().remove(music);
-          playlistRepository.save(playlist);
-        }
-      });
-      musicRepository.delete(music);
-    }
+    if ( !musicOpt.isPresent() ) {
+      throw new Exception("No music with provided id found");
+    } 
+    MusicEntity music = musicOpt.get();
+    // Deletes it from all playlists that contains it
+    List<PlaylistEntity> playlists = playlistRepository.findAll();
+    playlists.forEach( playlist -> {
+      if ( playlist.getMusics().contains(music) ) {
+        playlist.getMusics().remove(music);
+        playlistRepository.save(playlist);
+      }
+    });
+    // Delete music
+    musicRepository.delete(music);
   }
 }

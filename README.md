@@ -1,11 +1,16 @@
 # Music Playlist 2
 
-This is a personal project developed with the objective of applying the concepts I've learned in my programmig studies, so it is still incomplete.
+This project started as a way to apply the concepts I learned in my studies and courses, but as I had more and more ideas for it, it turned into my main goal.
 
-The application will be responsible for managing various music playlist. You'll be able to create playlists, insert and remove musics in them and also delete entire playlists if you want.
+The application will be a simplified version of Spotify, allowing users to search for songs, artists and albums and create their own playlists.
 
-Using the Spotify API you can search for all the spotify portfolio of musics to add you favorite songs in your playlists, althog although the audio file is restricted for premium spotify users, so the application can only save the music informations such as name, artist, albuns, duration, and so on.
+The project's backend structure is divided into three layers: Repository, Service and Controller.
 
-The next step is to use JDBC to link the application to a MySQL database, so the musics can actually stay saved in the playlists.
+The Repository layer is responsible to manage the persistence of entities in the database, ensuring that their states are saved, updated and retrieved as needed. It uses the JPA Repository for this.
 
-After that i'll need to study about frontend concepts like HTML and CSS to create an user interface for the application and how to link everything in the project. 
+The Service layer handles HTTP requests to the Spotify API, as well as CRUD operations between the database and the application. With the spotify API, the application can access Spotify's entire portfolio of songs and albums, which can be saved to the database if the user wants to add them to a playlist.
+Of course, the audio file is restricted to premium users only, so the application won't be able to actually play the songs, just show their information.
+
+The Controller layer acts as an intermediary, handling incoming HTTP requests, processing them, and returning appropriate JSON responses. It acts as a dispatcher, directing traffic and delegating work to other layers like the service layer.
+
+This project is a long-term goal, as I haven't fully mastered all the concepts needed for it's development yet and I'm stil studying them as I go. The frontend is the next task I'll focus on after the backend is complete.

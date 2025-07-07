@@ -17,7 +17,7 @@ public class PlaylistDTO {
   public PlaylistDTO( PlaylistEntity playlist ){
     this.id = playlist.getId();
     this.name = playlist.getName();
-    if (playlist.getMusics() != null) {
+    if ( !playlist.getMusics().isEmpty() ) {
       this.musics = playlist.getMusics().stream()
         .map(MusicDTO::new).toList();
     }
@@ -51,6 +51,7 @@ public class PlaylistDTO {
       }
     }
     this.musics.add( music );
+    music.addPlaylist(this);
   }
 
   public void listMusics() {

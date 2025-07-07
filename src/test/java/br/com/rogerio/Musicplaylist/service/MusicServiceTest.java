@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -21,7 +20,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import br.com.rogerio.Musicplaylist.dto.MusicDTO;
+import br.com.rogerio.Musicplaylist.dto.PlaylistDTO;
 import br.com.rogerio.Musicplaylist.entity.MusicEntity;
+import br.com.rogerio.Musicplaylist.entity.PlaylistEntity;
 import jakarta.persistence.EntityManager;
 
 @DataJpaTest
@@ -61,9 +62,9 @@ public class MusicServiceTest {
     Exception thrown = assertThrows(Exception.class, () -> {
       List<MusicDTO> result = this.musicService.readAllMusic();
       // Verify
-      assertThat(result.isEmpty()).isTrue();
+      assertTrue(result.isEmpty());
     });
-    assertEquals("No music in database", thrown.getMessage());
+    assertEquals("No musics in database", thrown.getMessage());
   }
 
   @Test
@@ -81,7 +82,20 @@ public class MusicServiceTest {
 
   @Test
   public void testReadMusicById_MusicInAPlaylist_ShouldReadPlaylistAsWell() {
-
+    // Create and set Music and Playlist
+    MusicEntity musicEntity = new MusicEntity(this.createMusicWithoutId());
+    PlaylistEntity playlistEntity = musicEntity.getPlaylist().get(0);
+    playlistEntity.setMusics(List.of(musicEntity));
+    musicEntity.setPlaylist(List.of(playlistEntity));
+    // Insert it in database
+    this.entityManager.persist(musicEntity);
+    this.entityManager.persist(playlistEntity);
+    // Test readMusicById
+    MusicDTO resultMusic = this.musicService.readMusicById(1L);
+    // Verify
+    PlaylistDTO resultPlaylist = resultMusic.getPlaylist().get(0);
+    assertEquals("Test Music", resultPlaylist.getMusics().get(0).getName());
+    assertEquals("Test Playlist", resultPlaylist.getName());
   }
 
   @Test
@@ -140,8 +154,25 @@ public class MusicServiceTest {
   }
   
   @Test
-  public void testUpdateMusic_MusicIncludedInPlaylists_ShouldUpdatePlaylistsAsWell() {
-    
+  public void testUpdateMusic_MusicIncludedInPlaylists_ShouldUpdatePlaylistsAsWell() throws Exception {
+    // Create Music and Playlist
+    MusicEntity musicEntity = new MusicEntity(this.createMusicWithoutId());
+    PlaylistEntity playlistEntity = musicEntity.getPlaylist().get(0);
+    // Insert it in database
+    this.entityManager.persist(musicEntity);
+    this.entityManager.persist(playlistEntity);
+    this.entityManager.clear();
+    // Add music to the playlist
+    playlistEntity.setMusics(List.of(musicEntity));
+    PlaylistDTO playlistDto = new PlaylistDTO(playlistEntity);
+    MusicDTO musicDto = new MusicDTO(musicEntity);
+    musicDto.addPlaylist(playlistDto);
+    // Test updateMusic
+    MusicDTO resultMusic = musicService.updateMusic(musicDto); 
+    PlaylistDTO resultPlaylist = resultMusic.getPlaylist().get(0);
+    // Verify
+    assertFalse(resultMusic.getPlaylist().isEmpty());
+    assertEquals("Test Playlist", resultPlaylist.getName());
   }
 
   @Test
@@ -182,6 +213,23 @@ public class MusicServiceTest {
     // Verify
     assertFalse(this.entityManager.contains(musicEntity));
   }
+  
+  @Test
+  public void testDeleteMusic_MusicInPlaylists_ShouldDeleteFromPlaylistsAsWell() throws Exception {
+    // Create and set Music and Playlist
+    MusicEntity musicEntity = new MusicEntity(this.createMusicWithoutId());
+    PlaylistEntity playlistEntity = musicEntity.getPlaylist().get(0);
+    playlistEntity.setMusics(List.of(musicEntity));
+    musicEntity.setPlaylist(List.of(playlistEntity));
+    assertFalse(playlistEntity.getMusics().isEmpty());
+    // Insert it in database
+    this.entityManager.persist(musicEntity);
+    this.entityManager.persist(playlistEntity);
+    // Test deleteMusic()
+    this.musicService.deleteMusic(1L);
+    // Verify with entity manager context not cleared
+    assertTrue(playlistEntity.getMusics().isEmpty());
+  }
 
   @Test
   public void testDeleteMusic_MusicNotFound_ShouldThrowException() {
@@ -192,14 +240,9 @@ public class MusicServiceTest {
     assertEquals("No music with provided id found", thrown.getMessage());
   }
 
-  @Test
-  public void testDeleteMusic_MusicInPlaylists_ShouldDeleteFromPlaylistsAsWell() {
-
-  }
-
   private MusicDTO createMusicWithoutId() {
     // Create DTO based on JSON string
-    String musicDTOJson = "{\"name\":\"Test Music\",\"artistsList\":[\"Artist 1\",\"Artist 2\"],\"album\":\"Test Album\",\"duration_s\":180.0,\"playlist\":[],\"liked\":true}";
+    String musicDTOJson = "{\"name\":\"Test Music\",\"artistsList\":[\"Artist 1\",\"Artist 2\"],\"album\":\"Test Album\",\"duration_s\":180.0,\"playlist\":[{\"name\":\"Test Playlist\"}],\"liked\":true}";
     ConvertsData deserialize = new ConvertsData();
     return deserialize.getData(musicDTOJson, MusicDTO.class);
   }

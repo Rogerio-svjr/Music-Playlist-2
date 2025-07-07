@@ -1,6 +1,7 @@
 package br.com.rogerio.Musicplaylist.dto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -65,6 +66,24 @@ public class PlaylistDTOTest {
 
     assertEquals("Test Music", testPlaylist.getMusics().get(0).getName());
   }
+  
+    @Test
+    public void testAddMusic_ShouldChangeValueOffMusicAsWell() {
+      // Create playlist entity mock
+      PlaylistEntity mockPlaylistEntity = Mockito.mock(PlaylistEntity.class);
+      // Define mock behavior
+      Mockito.when(mockPlaylistEntity.getId()).thenReturn(1L);
+      Mockito.when(mockPlaylistEntity.getName()).thenReturn("Test Playlist");
+      // Create music and playlist
+      MusicDTO musicDto = new MusicDTO();
+      PlaylistDTO playlistDto = new PlaylistDTO(mockPlaylistEntity);
+      // Test addMusic()
+      playlistDto.addMusic(musicDto);
+      // Verify if music "playlist" field changed as well
+      assertFalse(musicDto.getPlaylist().isEmpty());
+      assertEquals(1L, musicDto.getPlaylist().get(0).getId()); 
+      assertEquals("Test Playlist", musicDto.getPlaylist().get(0).getName()); 
+    }
   
   @Test
   public void testAddMusic_AddingRepeatedMusic_ShouldNotAdd() {

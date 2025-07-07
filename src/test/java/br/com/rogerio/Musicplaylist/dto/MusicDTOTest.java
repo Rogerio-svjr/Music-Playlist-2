@@ -1,6 +1,7 @@
 package br.com.rogerio.Musicplaylist.dto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -12,6 +13,7 @@ import org.mockito.Mockito;
 
 import br.com.rogerio.Musicplaylist.entity.Artist;
 import br.com.rogerio.Musicplaylist.entity.MusicEntity;
+import br.com.rogerio.Musicplaylist.entity.PlaylistEntity;
 
 public class MusicDTOTest {
   @Test
@@ -215,5 +217,23 @@ public class MusicDTOTest {
     String Expected = "-35791:-22";
 
     assertEquals(Expected, actual);
+  }
+
+  @Test
+  public void testAddPlaylist_ShouldAddNewPlaylistToplaylistField() {
+    // Create playlists mock
+    PlaylistEntity mockPlaylistEntity = Mockito.mock(PlaylistEntity.class);
+    // Define mock behavior
+    Mockito.when(mockPlaylistEntity.getId()).thenReturn(1L);
+    Mockito.when(mockPlaylistEntity.getName()).thenReturn("Test Playlist");
+    // Create music and playlist
+    MusicDTO musicDto = new MusicDTO();
+    PlaylistDTO playlistDto = new PlaylistDTO(mockPlaylistEntity);
+    // test addPlaylist
+    musicDto.addPlaylist(playlistDto);
+    // Verify
+    assertFalse(musicDto.getPlaylist().isEmpty());
+    assertEquals(1L, musicDto.getPlaylist().get(0).getId());
+    assertEquals("Test Playlist", musicDto.getPlaylist().get(0).getName());
   }
 }

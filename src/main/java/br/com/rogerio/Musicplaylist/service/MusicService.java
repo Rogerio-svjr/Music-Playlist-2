@@ -1,5 +1,6 @@
 package br.com.rogerio.Musicplaylist.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.rogerio.Musicplaylist.dto.MusicDTO;
+import br.com.rogerio.Musicplaylist.dto.PlaylistDTO;
 import br.com.rogerio.Musicplaylist.entity.MusicEntity;
 import br.com.rogerio.Musicplaylist.entity.PlaylistEntity;
 import br.com.rogerio.Musicplaylist.repository.MusicRepository;
@@ -32,20 +34,28 @@ public class MusicService {
   // Create
   @Transactional
   public MusicDTO createMusic( MusicDTO music ) {
-    // Check if music is already on the database
     MusicEntity musicEntity = new MusicEntity(music);
+    System.out.println("DEBUG: Inside createMusic");
+    // Check if music is already on the database
+    // Use an example matcher to ignore "Liked" and "playlist" fields
     ExampleMatcher matcher = ExampleMatcher.matching()
     .withIgnorePaths("liked", "playlist");
     Example<MusicEntity> example = Example.of(musicEntity, matcher);
     Optional<MusicEntity> result = musicRepository.findOne(example);
     // If it is, returns it. If not, creates it.
+    MusicEntity returnMusicEntity = new MusicEntity();
     if( result.isPresent() ) {
-      System.out.println("\nMUSIC ALREADY IN DATABASE!\n");
-      return new MusicDTO( result.get() );
+      System.out.println("DEBUG: Music already in database");
+      returnMusicEntity = result.get();
     } else {
-      System.out.println("\nmusic put into databse: " + music.getName() + "\n");
-      return new MusicDTO( musicRepository.save(musicEntity) );
+      System.out.println("DEBUG: Music put in database");
+      returnMusicEntity = musicRepository.save(musicEntity);
     }
+    MusicDTO returnMusic = new MusicDTO(returnMusicEntity);
+    // Set "playlist" field since the MusicDTO contructor doesn't handle it
+    returnMusic.setPlaylist(returnMusicEntity.getPlaylist()
+      .stream().map(PlaylistDTO::new).toList());
+    return returnMusic;
   }
 
   // Update
@@ -60,9 +70,14 @@ public class MusicService {
     if ( !opt.isPresent() ) {
       throw new Exception("Provided music not found");
     }
+    // Update music on database
     MusicEntity musicEntity = new MusicEntity(music);
-    // Update music on database and returns it
-    return new MusicDTO( musicRepository.save(musicEntity) );
+    MusicDTO musicDto = new MusicDTO( musicRepository.save(musicEntity) ); 
+    // Set the "playlist" field since the MusicDTO contructor doesn't handle it
+    musicDto.setPlaylist(musicEntity.getPlaylist().stream()
+      .map(PlaylistDTO::new).toList());
+    // Return updated music
+    return musicDto;
   }
 
   // Read 
@@ -71,7 +86,7 @@ public class MusicService {
     List<MusicEntity> musics = musicRepository.findAll();
     // Verify if the database is empty
     if( musics.isEmpty() ) {
-      throw new Exception("No music in database");
+      throw new Exception("No musics in database");
     }
     // Returns a list of all present musics
     return musics.stream().map(MusicDTO::new).toList();
@@ -79,7 +94,24 @@ public class MusicService {
   
   @Transactional
   public MusicDTO readMusicById( Long id ) throws NoSuchElementException {
-    return new MusicDTO( musicRepository.findById(id).get() );
+    // Read music by id
+    MusicEntity music = musicRepository.findById(id).get();
+    // Retrieve all playlists on database
+    List<PlaylistEntity> playlists = playlistRepository.findAll();
+    List<PlaylistEntity> auxPlaylistList = new ArrayList<>();
+    // run through all playlists
+    playlists.forEach( playlist -> {
+      // If the playlist have the requested music, add it to the auxiliar playlist list
+      if ( playlist.getMusics().contains(music) ) {
+        auxPlaylistList.add(playlist);
+      }
+    });
+    // Set the "playlist" field since the MusicDTO contructor doesn't handle it
+    MusicDTO musicDto = new MusicDTO( music );
+    musicDto.setPlaylist(auxPlaylistList.stream()
+      .map(PlaylistDTO::new).toList());
+    // Returns requested music
+    return musicDto;
   }
 
   // Delete

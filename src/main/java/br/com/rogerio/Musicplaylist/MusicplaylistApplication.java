@@ -86,14 +86,18 @@ public class MusicplaylistApplication implements CommandLineRunner{
 		// Save playlist on the database (testing create)
 		PlaylistDTO rock = new PlaylistDTO();
 		rock.setName("Rock");
-		rock = playlistService.createPlaylist(rock);
+		try{
+			rock = playlistService.createPlaylist(rock);
+		} catch(Exception e) {}
 		System.out.println("\nCREATE:\n" + rock.getName() + "\n");
 		// Read playlist from database
 		List<PlaylistDTO> playlistList;
-		playlistList = playlistService.readAllPlaylists();
-		System.out.println("\nREAD ALL:");
-		playlistList.forEach(list -> System.out.println(list.getName() + " - " + list.getMusics().size()));
-		System.out.println();
+		try {
+			playlistList = playlistService.readAllPlaylists();
+			System.out.println("\nREAD ALL:");
+			playlistList.forEach(list -> System.out.println(list.getName() + " - " + list.getMusics().size()));
+			System.out.println();
+		} catch (Exception e) {}
 		// Update playlist from database
 		playlist.addMusic(track);
 		rock.setMusics(playlist.getMusics());
@@ -105,8 +109,10 @@ public class MusicplaylistApplication implements CommandLineRunner{
 		// Delete playlist from database
 		System.out.println("\nDELETE:");
 		playlistService.deletePlaylist(indie.getId());
-		playlistList = playlistService.readAllPlaylists();
-		playlistList.forEach(list -> System.out.println(list.getName() + " - " + list.getMusics().size()));
+		try {
+			playlistList = playlistService.readAllPlaylists();
+			playlistList.forEach(list -> System.out.println(list.getName() + " - " + list.getMusics().size()));
+		} catch (Exception e) {}
 	}
 
 	public void testDTOEntityMusicConstructors() {

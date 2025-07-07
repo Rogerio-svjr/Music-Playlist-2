@@ -52,7 +52,7 @@ public class MusicEntity {
 
 	//Constructors
 	public MusicEntity() {}
-	public MusicEntity( MusicDTO music ){
+	public MusicEntity( MusicDTO music ) {
 		this.id = music.getId();
     this.name = music.getName();
 		this.artists = music.getArtistsList().stream().map(Artist::new).toList();
@@ -86,7 +86,7 @@ public class MusicEntity {
 		}
 		return artists;
 	}
-	public String getArtistsNames(){
+	public String getArtistsNames() {
 		// If the entity came from the API the artistsNames field would be null
 		if ( this.artists != null && this.artistsNames == null ) {
 			List<String> artistsList = this.getArtists().stream().map(Artist::getName).toList();
@@ -101,7 +101,7 @@ public class MusicEntity {
 		}
 		return album;
 	}
-	public String getAlbumName(){
+	public String getAlbumName() {
 		// If the entity came from API, the albumName field would be null
 		if ( this.album != null && this.albumName == null ) {
 			this.albumName = this.album.getName();

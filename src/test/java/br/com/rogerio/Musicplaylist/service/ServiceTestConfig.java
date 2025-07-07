@@ -11,10 +11,16 @@ import br.com.rogerio.Musicplaylist.repository.PlaylistRepository;
 @SpringBootConfiguration
 @EnableAutoConfiguration
 @TestConfiguration
-public class MusicServiceTestConfig {
+public class ServiceTestConfig {
 
   @Bean
   public MusicService musicService(MusicRepository musicRepository, PlaylistRepository playlistRepository) {
     return new MusicService(musicRepository, playlistRepository);
   }
+
+  @Bean
+  public PlaylistService playlistService(PlaylistRepository playlistRepository) {
+    return new PlaylistService(playlistRepository);
+  }
+
 }

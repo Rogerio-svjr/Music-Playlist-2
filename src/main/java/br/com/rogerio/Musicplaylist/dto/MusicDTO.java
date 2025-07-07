@@ -74,4 +74,8 @@ public class MusicDTO {
 		float f_durationMin = this.getDuration_s() / 60;
 		return String.format("%d:%02d", (int) f_durationMin, (int) (( f_durationMin - (int) f_durationMin ) * 60) );
 	}
+  // Add playlist to the playlist list
+  public void addPlaylist( PlaylistDTO playlistDto ) {
+    this.playlist.add(playlistDto);
+  }
 }

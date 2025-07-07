@@ -1,11 +1,14 @@
 package br.com.rogerio.Musicplaylist.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.rogerio.Musicplaylist.dto.MusicDTO;
 import br.com.rogerio.Musicplaylist.dto.PlaylistDTO;
 import br.com.rogerio.Musicplaylist.entity.MusicEntity;
 import br.com.rogerio.Musicplaylist.entity.PlaylistEntity;
@@ -24,34 +27,52 @@ public class PlaylistService {
   }
 
   // Create 
-  public PlaylistDTO createPlaylist( PlaylistDTO playlist ){
+  public PlaylistDTO createPlaylist( PlaylistDTO playlist ) throws Exception {
+    if( playlist.getId() != null ) {
+      throw new Exception("Provided playlist with id");
+    }
+    // Check if playlist already have musics in it
+    if( !playlist.getMusics().isEmpty() ) {
+      throw new Exception("Playlist already exists");
+    }
+    // Create playlist and returns it
     PlaylistEntity playlistEntity = new PlaylistEntity(playlist);
     return new PlaylistDTO( playlistRepository.save(playlistEntity) );
   }
 
   // Update
   @Transactional
-  public PlaylistDTO updatePlaylist( PlaylistDTO playlist ){
+  public PlaylistDTO updatePlaylist( PlaylistDTO playlist ) {
+    // Check if playlist already have musics in it
+    if( !playlist.getMusics().isEmpty() ) {
+      // Create auxiliar music list to set playlist's "musics" field
+      List<MusicDTO> auxMusicList = new ArrayList<>();
+      // If it has, insert them in database
+      for( MusicDTO music : playlist.getMusics() ) {
+        music.addPlaylist(playlist);
+        auxMusicList.add( musicService.createMusic( music ) );
+      }
+      // Set musics field
+      playlist.setMusics(auxMusicList);
+    }
     PlaylistEntity playlistEntity = new PlaylistEntity(playlist);
-    // Make sure that all the playlist's musics are on database
-    List<MusicEntity> musics = playlist.getMusics().stream()
-      .map( musicDTO -> {
-        return new MusicEntity( musicService.createMusic(musicDTO) );
-      }).toList();
-    playlistEntity.setMusics(musics);
-    // Update the database
     return new PlaylistDTO( playlistRepository.save(playlistEntity) );
   }
 
   // Read 
   @Transactional(readOnly = true)
-  public List<PlaylistDTO> readAllPlaylists() {
+  public List<PlaylistDTO> readAllPlaylists() throws Exception {
     List<PlaylistEntity> playlists = playlistRepository.findAll();
+    // Verify if the database is empty
+    if( playlists.isEmpty() ) {
+      throw new Exception("No playlists in database");
+    }
+    // Returns a list of all present playlists
     return playlists.stream().map(PlaylistDTO::new).toList();
   }
   
   @Transactional(readOnly = true)
-  public PlaylistDTO readPlaylistById( Long id ) {
+  public PlaylistDTO readPlaylistById( Long id ) throws NoSuchElementException {
     return new PlaylistDTO( playlistRepository.findById(id).get() );
   }
 

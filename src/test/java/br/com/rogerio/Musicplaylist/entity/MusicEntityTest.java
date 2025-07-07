@@ -2,6 +2,7 @@ package br.com.rogerio.Musicplaylist.entity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.lang.reflect.Field;
@@ -12,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import br.com.rogerio.Musicplaylist.dto.MusicDTO;
-import br.com.rogerio.Musicplaylist.dto.PlaylistDTO;
+import br.com.rogerio.Musicplaylist.service.ConvertsData;
 
 public class MusicEntityTest {
   @Test
@@ -45,20 +46,18 @@ public class MusicEntityTest {
   }
 
   @Test
-  public void testConstructor_MusicInTwoPlaylists_shouldReturnPlaylistsId() {
-    // Create mock objects 
-    PlaylistDTO mockPlaylist1 = Mockito.mock(PlaylistDTO.class);
-    PlaylistDTO mockPlaylist2 = Mockito.mock(PlaylistDTO.class);
-    MusicDTO mockMusicDTO = Mockito.mock(MusicDTO.class);
-    // Defines expected mock behavior
-    Mockito.when(mockPlaylist1.getId()).thenReturn(1L);
-    Mockito.when(mockPlaylist2.getId()).thenReturn(2L);
-    Mockito.when(mockMusicDTO.getPlaylist()).thenReturn(List.of(mockPlaylist1, mockPlaylist2));
-    // Test constructor
-    MusicEntity musicEntity = new MusicEntity(mockMusicDTO);
+  public void testConstructor_MusicInTwoPlaylists_ShouldNotSetPlaylistField() {
+    // If both MusicEntity and PlaylistEntity are setting each other on their constructors,
+    // the program will get stuck on an infinite loop of one creating the other, causing a StackOverflowError.
+    // Create DTO based on JSON string
+    String musicDTOJson = "{\"name\":\"Test Music\",\"artistsList\":[\"Artist 1\",\"Artist 2\"],\"album\":\"Test Album\",\"duration_s\":180.0,\"playlist\":[{\"name\":\"Test Playlist\"}, {\"name\":\"Test Playlist 2\"}],\"liked\":true}";
+    ConvertsData deserialize = new ConvertsData();
+    MusicDTO musicDto = deserialize.getData(musicDTOJson, MusicDTO.class);
+    // // Test constructor
+    MusicEntity musicEntity = new MusicEntity(musicDto);
     // Verify
-    assertEquals(1L, musicEntity.getPlaylist().get(0).getId());
-    assertEquals(2L, musicEntity.getPlaylist().get(1).getId());
+    assertTrue( musicEntity.getPlaylist().isEmpty() );
+    // assertEquals(2L, musicEntity.getPlaylist().get(1).getId());
   }
 
   @Test

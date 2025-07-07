@@ -117,15 +117,16 @@ public class PlaylistServiceTest {
   @Test
   public void testUpdatePlaylist_ShouldUpdatePlaylistAndMusicsPlaylistField() {
     // Create playlist and insert in database 
-    PlaylistEntity playlistEntity = new PlaylistEntity( this.createPlaylistWithoutId() );
+    PlaylistDTO playlistDto = this.createPlaylistWithoutId();
+    PlaylistEntity playlistEntity = new PlaylistEntity( playlistDto );
     this.entityManager.persist(playlistEntity);
     this.entityManager.clear();
-     // Assert the previous value of each field
+    // Assert the previous value of each field
     assertEquals(1L, playlistEntity.getId());
     assertEquals("Test Playlist", playlistEntity.getName());
     assertTrue(playlistEntity.getMusics().isEmpty());
     // Changes playlist's fields
-    PlaylistDTO playlistDto = this.createPlaylistWithId();
+    playlistDto = this.createPlaylistWithId();
     playlistDto.setName("Updated Name");
     // Test updatePlaylist()
     PlaylistDTO result = this.playlistService.updatePlaylist(playlistDto);

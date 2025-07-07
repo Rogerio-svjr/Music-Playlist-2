@@ -45,10 +45,8 @@ public class MusicService {
     // If it is, returns it. If not, creates it.
     MusicEntity returnMusicEntity = new MusicEntity();
     if( result.isPresent() ) {
-      System.out.println("DEBUG: Music already in database");
       returnMusicEntity = result.get();
     } else {
-      System.out.println("DEBUG: Music put in database");
       returnMusicEntity = musicRepository.save(musicEntity);
     }
     MusicDTO returnMusic = new MusicDTO(returnMusicEntity);
@@ -70,14 +68,28 @@ public class MusicService {
     if ( !opt.isPresent() ) {
       throw new Exception("Provided music not found");
     }
+    MusicEntity musicEntity = new MusicEntity( music );
+    // Set the "playlist" field since the MusicEntity constructor doesn't handle it
+    musicEntity.setPlaylist(music.getPlaylist()
+      .stream().map(PlaylistEntity::new).toList());
     // Update music on database
-    MusicEntity musicEntity = new MusicEntity(music);
-    MusicDTO musicDto = new MusicDTO( musicRepository.save(musicEntity) ); 
-    // Set the "playlist" field since the MusicDTO contructor doesn't handle it
-    musicDto.setPlaylist(musicEntity.getPlaylist().stream()
-      .map(PlaylistDTO::new).toList());
+    MusicEntity resultMusicEntity = musicRepository.save( musicEntity ); 
+    // Run through all the results' playlists to update them as well
+    List<PlaylistEntity> resultPlaylistList = new ArrayList<>();
+    for( PlaylistEntity playlist : resultMusicEntity.getPlaylist() ) {
+      // Add the music in the playlist if it's not in it yet
+      if( !playlist.getMusics().contains(resultMusicEntity) ) {
+        playlist.getMusics().add( resultMusicEntity );
+      }
+      // Add each playlist in an auxiliar playlist list after updating them
+      resultPlaylistList.add( playlistRepository.save(playlist) );
+    }
+    // Set the "playlist" field since the MusicDTO constructor doesn't handle it
+    MusicDTO returnMusicDto = new MusicDTO( resultMusicEntity );
+    returnMusicDto.setPlaylist(resultPlaylistList
+      .stream().map(PlaylistDTO::new).toList());
     // Return updated music
-    return musicDto;
+    return returnMusicDto;
   }
 
   // Read 

@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.rogerio.Musicplaylist.dto.MusicDTO;
 import br.com.rogerio.Musicplaylist.dto.PlaylistDTO;
-import br.com.rogerio.Musicplaylist.entity.MusicEntity;
 import br.com.rogerio.Musicplaylist.entity.PlaylistEntity;
 import br.com.rogerio.Musicplaylist.repository.PlaylistRepository;
 
@@ -47,10 +46,12 @@ public class PlaylistService {
     if( !playlist.getMusics().isEmpty() ) {
       // Create auxiliar music list to set playlist's "musics" field
       List<MusicDTO> auxMusicList = new ArrayList<>();
-      // If it has, insert them in database
+      // If it has, update them as well
       for( MusicDTO music : playlist.getMusics() ) {
-        music.addPlaylist(playlist);
-        auxMusicList.add( musicService.createMusic( music ) );
+        // music.addPlaylist(playlist);
+        try {
+          auxMusicList.add( musicService.updateMusic( music ) );
+        } catch( Exception e ) {}
       }
       // Set musics field
       playlist.setMusics(auxMusicList);

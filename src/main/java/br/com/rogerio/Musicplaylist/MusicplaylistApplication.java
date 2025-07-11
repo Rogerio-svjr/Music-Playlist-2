@@ -28,7 +28,7 @@ public class MusicplaylistApplication implements CommandLineRunner{
 	}
 
 	@Override
-	public void run( String... args ){
+	public void run( String... args ) throws Exception {
 		var apiConsumption = new spotifyRequest();
 
 		// Searches a track named "savior" and receives 10 results  

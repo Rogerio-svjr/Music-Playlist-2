@@ -19,8 +19,8 @@ public class ServiceTestConfig {
   }
 
   @Bean
-  public PlaylistService playlistService(PlaylistRepository playlistRepository) {
-    return new PlaylistService(playlistRepository);
+  public PlaylistService playlistService(PlaylistRepository playlistRepository, MusicRepository musicRepository) {
+    return new PlaylistService(playlistRepository, musicRepository);
   }
 
 }

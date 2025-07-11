@@ -124,6 +124,20 @@ public class MusicServiceTest {
   }
 
   @Test
+  public void testCreateMusic_MusicInAPlaylistAlready_ShouldCreateOrUpdatePlaylistAsWell() {
+    // Create musicDto
+    MusicDTO musicDto = this.createMusicWithoutId();
+    // Test creatMusic()
+    MusicDTO resultMusic = this.musicService.createMusic(musicDto);
+    // Verify
+    assertFalse(resultMusic.getPlaylist().isEmpty());
+    assertFalse(resultMusic.getPlaylist().get(0).getMusics().isEmpty());
+    assertEquals(1L, resultMusic.getPlaylist().get(0).getId());
+    assertEquals("Test Playlist", resultMusic.getPlaylist().get(0).getName());
+    assertEquals("Test Music", resultMusic.getPlaylist().get(0).getMusics().get(0).getName());
+  }
+
+  @Test
   public void testCreateMusic_MusicAlreadyInDatabase_ShouldNotCreateANewMusicAndReturnTheMusic() {
     // Create musicDto
     MusicDTO musicDto = this.createMusicWithoutId();

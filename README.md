@@ -13,4 +13,4 @@ Of course, the audio file is restricted to premium users only, so the applicatio
 
 The Controller layer acts as an intermediary, handling incoming HTTP requests, processing them, and returning appropriate JSON responses. It acts as a dispatcher, directing traffic and delegating work to other layers like the service layer.
 
-This project is a long-term goal, as I haven't fully mastered all the concepts needed for it's development yet and I'm stil studying them as I go. The frontend is the next task I'll focus on after the backend is complete.
+This project is a long-term goal, as I haven't fully mastered all the concepts needed for it's development yet and I'm still studying them as I go. The frontend is the next task I'll focus on after the backend is complete.

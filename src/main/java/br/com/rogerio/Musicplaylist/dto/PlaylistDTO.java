@@ -17,10 +17,9 @@ public class PlaylistDTO {
   public PlaylistDTO( PlaylistEntity playlist ){
     this.id = playlist.getId();
     this.name = playlist.getName();
-    if ( !playlist.getMusics().isEmpty() ) {
-      this.musics = playlist.getMusics().stream()
-        .map(MusicDTO::new).toList();
-    }
+    this.musics = new ArrayList<>(
+      playlist.getMusics().stream()
+        .map(MusicDTO::new).toList());
   }
 
   // Getters
@@ -42,6 +41,31 @@ public class PlaylistDTO {
     this.musics = new ArrayList<>(music);
   }
 
+  // HashCode and Equals
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((id == null) ? 0 : id.hashCode());
+    return result;
+  }
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    PlaylistDTO other = (PlaylistDTO) obj;
+    if (id == null) {
+      if (other.id != null)
+        return false;
+    } else if (!id.equals(other.id))
+      return false;
+    return true;
+  }
+  
   // Methods
   public void addMusic( MusicDTO music ) {
     // Check if music is in the playlist already

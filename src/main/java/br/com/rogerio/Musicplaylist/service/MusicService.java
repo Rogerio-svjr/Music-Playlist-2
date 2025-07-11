@@ -35,7 +35,10 @@ public class MusicService {
   @Transactional
   public MusicDTO createMusic( MusicDTO music ) {
     MusicEntity musicEntity = new MusicEntity(music);
-    System.out.println("DEBUG: Inside createMusic");
+    // Set "playlist" field since the MusicEntity contructor doesn't handle it
+    musicEntity.setPlaylist(new ArrayList<>(music.getPlaylist()
+      .stream().map(PlaylistEntity::new).toList()));
+
     // Check if music is already on the database
     // Use an example matcher to ignore "Liked" and "playlist" fields
     ExampleMatcher matcher = ExampleMatcher.matching()
@@ -49,10 +52,23 @@ public class MusicService {
     } else {
       returnMusicEntity = musicRepository.save(musicEntity);
     }
+
+    // Create or update the playlist as well
+    // Run through all the results' playlists to update them as well
+    List<PlaylistEntity> returnPlaylistList = new ArrayList<>();
+    for( PlaylistEntity playlist : returnMusicEntity.getPlaylist() ) {
+      // Add the music in the playlist if it's not in it yet
+      if( !playlist.getMusics().contains(returnMusicEntity) ) {
+        playlist.addMusic(returnMusicEntity);
+      }
+      // Add each playlist in an auxiliar playlist list after updating them
+      returnPlaylistList.add( playlistRepository.save(playlist) );
+    }
+
     MusicDTO returnMusic = new MusicDTO(returnMusicEntity);
     // Set "playlist" field since the MusicDTO contructor doesn't handle it
-    returnMusic.setPlaylist(returnMusicEntity.getPlaylist()
-      .stream().map(PlaylistDTO::new).toList());
+    returnMusic.setPlaylist(new ArrayList<>(returnPlaylistList
+      .stream().map(PlaylistDTO::new).toList()));
     return returnMusic;
   }
 
@@ -68,12 +84,15 @@ public class MusicService {
     if ( !opt.isPresent() ) {
       throw new Exception("Provided music not found");
     }
+
     MusicEntity musicEntity = new MusicEntity( music );
     // Set the "playlist" field since the MusicEntity constructor doesn't handle it
-    musicEntity.setPlaylist(music.getPlaylist()
-      .stream().map(PlaylistEntity::new).toList());
+    musicEntity.setPlaylist(new ArrayList<>(music.getPlaylist()
+    .stream().map(PlaylistEntity::new).toList()));
+
     // Update music on database
     MusicEntity resultMusicEntity = musicRepository.save( musicEntity ); 
+
     // Run through all the results' playlists to update them as well
     List<PlaylistEntity> resultPlaylistList = new ArrayList<>();
     for( PlaylistEntity playlist : resultMusicEntity.getPlaylist() ) {
@@ -84,10 +103,11 @@ public class MusicService {
       // Add each playlist in an auxiliar playlist list after updating them
       resultPlaylistList.add( playlistRepository.save(playlist) );
     }
-    // Set the "playlist" field since the MusicDTO constructor doesn't handle it
+    
     MusicDTO returnMusicDto = new MusicDTO( resultMusicEntity );
-    returnMusicDto.setPlaylist(resultPlaylistList
-      .stream().map(PlaylistDTO::new).toList());
+    // Set the "playlist" field since the MusicDTO constructor doesn't handle it
+    returnMusicDto.setPlaylist(new ArrayList<>(resultPlaylistList
+      .stream().map(PlaylistDTO::new).toList()));
     // Return updated music
     return returnMusicDto;
   }
@@ -135,6 +155,7 @@ public class MusicService {
       throw new Exception("No music with provided id found");
     } 
     MusicEntity music = musicOpt.get();
+    
     // Deletes it from all playlists that contains it
     List<PlaylistEntity> playlists = playlistRepository.findAll();
     playlists.forEach( playlist -> {

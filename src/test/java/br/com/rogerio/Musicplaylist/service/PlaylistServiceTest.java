@@ -6,10 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -18,6 +20,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import br.com.rogerio.Musicplaylist.dto.PlaylistDTO;
+import br.com.rogerio.Musicplaylist.entity.Artist;
+import br.com.rogerio.Musicplaylist.entity.MusicEntity;
 import br.com.rogerio.Musicplaylist.entity.PlaylistEntity;
 import jakarta.persistence.EntityManager;
 
@@ -85,7 +89,7 @@ public class PlaylistServiceTest {
   }
 
   @Test
-  public void testCreatePlaylist_ShouldCreateNewPlaylist() throws Exception{
+  public void testCreatePlaylist_ShouldCreateNewPlaylist() throws Exception {
     // Test createPlaylist
     PlaylistDTO result = this.playlistService.createPlaylist(this.createPlaylistWithoutId());
     // Verify
@@ -115,7 +119,27 @@ public class PlaylistServiceTest {
   }
 
   @Test
-  public void testUpdatePlaylist_ShouldUpdatePlaylistAndMusicsPlaylistField() {
+  public void testUpdatePlaylist_ShouldUpdatePlaylistName() throws Exception {
+    // Create playlist and insert in database 
+    PlaylistDTO playlistDto = this.createPlaylistWithoutId();
+    PlaylistEntity playlistEntity = new PlaylistEntity( playlistDto );
+    this.entityManager.persist(playlistEntity);
+    this.entityManager.clear();
+    // Assert the previous value of each field
+    assertEquals(1L, playlistEntity.getId());
+    assertEquals("Test Playlist", playlistEntity.getName());
+    // Set playlist's id and changes playlist's name
+    playlistDto = new PlaylistDTO(playlistEntity);
+    playlistDto.setName("Updated Name");
+    // Test updatePlaylist()
+    PlaylistDTO result = this.playlistService.updatePlaylist(playlistDto);
+    // Verify
+    assertEquals(1L, result.getId());
+    assertEquals("Updated Name", result.getName());
+  }
+
+  @Test
+  public void testUpdatePlaylist_AddedMusicsInPlaylist_ShouldUpdatePlaylistAndMusics() throws Exception {
     // Create playlist and insert in database 
     PlaylistDTO playlistDto = this.createPlaylistWithoutId();
     PlaylistEntity playlistEntity = new PlaylistEntity( playlistDto );
@@ -126,7 +150,7 @@ public class PlaylistServiceTest {
     assertEquals("Test Playlist", playlistEntity.getName());
     assertTrue(playlistEntity.getMusics().isEmpty());
     // Changes playlist's fields
-    playlistDto = this.createPlaylistWithId();
+    playlistDto = this.createPlaylistWithId(); // Add musics
     playlistDto.setName("Updated Name");
     // Test updatePlaylist()
     PlaylistDTO result = this.playlistService.updatePlaylist(playlistDto);
@@ -140,43 +164,131 @@ public class PlaylistServiceTest {
   }
 
   @Test 
-  public void testUpdatePlaylist_PlaylistWithoutIdProvided_ShouldThrowException() {
+  public void testUpdatePlaylist_ChangedAlreadyExistingPlaylistName_ShouldUpdateMusicsPlaylistField() throws Exception {
+    // Create playlist and music and insert them in database 
+    PlaylistDTO playlistDto = this.createPlaylistWithMusics();
+    PlaylistEntity playlistEntity = new PlaylistEntity( playlistDto );
+    MusicEntity musicEntity = playlistEntity.getMusics().get(0);
+    musicEntity.setPlaylist( List.of( playlistEntity ) );
+    this.entityManager.persist( playlistEntity );
+    this.entityManager.persist( musicEntity );
+    this.entityManager.clear();
+    // Assert the previous value of each field
+    assertEquals(1L, playlistEntity.getId());
+    assertEquals("Test Playlist", playlistEntity.getName());
+    assertFalse(playlistEntity.getMusics().isEmpty());
+    assertEquals(1L, musicEntity.getId());
+    assertEquals("Test Playlist", musicEntity.getPlaylist().get(0).getName());
+    // Change playlist name
+    PlaylistDTO changedPlaylist = new PlaylistDTO( playlistEntity );
+    changedPlaylist.setName("Updated Name"); 
+    // Test updatePlaylist
+    PlaylistDTO result = this.playlistService.updatePlaylist( changedPlaylist );
+    // Verify
+    assertEquals(1L, result.getMusics().get(0).getId());
+    assertEquals("Updated Name", result.getName());
+    assertEquals("Updated Name", result.getMusics().get(0).getPlaylist().get(0).getName());
+  }
 
+  @Test 
+  public void testUpdatePlaylist_PlaylistWithoutIdProvided_ShouldThrowException() {
+    // Create playlist without id 
+    PlaylistDTO playlistDto = this.createPlaylistWithoutId();
+    // Test updatePlaylist
+    Exception thrown = assertThrows(Exception.class, () -> {
+      PlaylistDTO result = this.playlistService.updatePlaylist(playlistDto);
+      assertNull(result.getId());
+    });
+    assertEquals("Provided playlist without id", thrown.getMessage());
   }
 
   @Test
   public void testUpdatePlaylist_PlaylistNotFound_ShouldThrowException() {
-
+    // Create playlist without id 
+    PlaylistDTO playlistDto = this.createPlaylistWithId();
+    // Test updatePlaylist
+    Exception thrown = assertThrows(Exception.class, () -> {
+      PlaylistDTO result = this.playlistService.updatePlaylist(playlistDto);
+      assertNull(result.getId());
+    });
+    assertEquals("Provided playlist not found", thrown.getMessage());
   }
 
   @Test
-  public void testDeletePlaylist_ShouldDeletePlaylistAndMusicsPlaylistField() {
-
+  public void testDeletePlaylist_ShouldDeletePlaylistAndMusicsPlaylistField() throws Exception {
+     // Create playlist and music and insert them in database 
+    PlaylistDTO playlistDto = this.createPlaylistWithMusics();
+    PlaylistEntity playlistEntity = new PlaylistEntity( playlistDto );
+    MusicEntity musicEntity = playlistEntity.getMusics().get(0);
+    List<PlaylistEntity> playlistList = new ArrayList<>(List.of(playlistEntity));
+    musicEntity.setPlaylist( playlistList );
+    this.entityManager.persist( playlistEntity );
+    this.entityManager.persist( musicEntity );
+    // Assert that the playlist and music are saved
+    assertEquals(1L, playlistEntity.getId());
+    assertFalse(playlistEntity.getMusics().isEmpty());
+    assertEquals(1L, musicEntity.getId());
+    assertEquals(musicEntity, playlistEntity.getMusics().get(0));
+    // Test deletePlaylist
+    playlistService.deletePlaylist(1L);
+    // Verify
+    assertFalse(entityManager.contains(playlistEntity));
+    assertTrue(musicEntity.getPlaylist().isEmpty());
   }
 
   @Test
   public void testDeletePlaylist_PlaylistNotFound_ShouldThrowException() {
-
+    // Try to delete a playlist from database without inserting it first
+    Exception thrown = assertThrows(Exception.class, () -> {
+      this.playlistService.deletePlaylist(1L);
+    });
+    assertEquals("No playlist with provided id found", thrown.getMessage());
   }
 
   private PlaylistDTO createPlaylistWithoutId() {
-    // Create DTO based on JSON string
-    String playlistDTOJson = "{\"name\":\"Test Playlist\"}";
-    ConvertsData deserialize = new ConvertsData();
-    return deserialize.getData(playlistDTOJson, PlaylistDTO.class);
+    // Create mocks
+    PlaylistEntity mockPlaylistEntity = Mockito.mock(PlaylistEntity.class);
+    // Define mock behavior
+    Mockito.when(mockPlaylistEntity.getId()).thenReturn(null);
+    Mockito.when(mockPlaylistEntity.getName()).thenReturn("Test Playlist");
+    return new PlaylistDTO(mockPlaylistEntity);
   }
 
   private PlaylistDTO createPlaylistWithMusics() {
-    // Create DTO based on JSON string
-    String playlistDTOJson = "{\"name\":\"Test Playlist\",\"musics\":[{\"name\":\"Test Music\",\"artistsList\":[\"Artist 1\",\"Artist 2\"],\"album\":\"Test Album\",\"duration_s\":180.0,\"playlist\":[{\"name\":\"Test Playlist\"}],\"liked\":true}]}";
-    ConvertsData deserialize = new ConvertsData();
-    return deserialize.getData(playlistDTOJson, PlaylistDTO.class);
+    // Create mocks
+    PlaylistEntity mockPlaylistEntity = Mockito.mock(PlaylistEntity.class);
+    MusicEntity mockMusicEntity = Mockito.mock(MusicEntity.class);
+    // Define mock behavior
+    Mockito.when(mockPlaylistEntity.getId()).thenReturn(null);
+    Mockito.when(mockPlaylistEntity.getName()).thenReturn("Test Playlist");
+    Mockito.when(mockMusicEntity.getId()).thenReturn(null);
+    Mockito.when(mockMusicEntity.getName()).thenReturn("Test Music");
+    Mockito.when(mockMusicEntity.getArtists()).thenReturn(List.of(new Artist("A1"), new Artist("A2")));
+    Mockito.when(mockMusicEntity.getAlbumName()).thenReturn("Test Album");
+    Mockito.when(mockMusicEntity.getDuration_ms()).thenReturn(185000);
+    Mockito.when(mockMusicEntity.getLiked()).thenReturn(false);
+    List<MusicEntity> musicsField = new ArrayList<>();
+    musicsField.add(mockMusicEntity);
+    Mockito.when(mockPlaylistEntity.getMusics()).thenReturn(musicsField);
+    return new PlaylistDTO(mockPlaylistEntity);
   }
 
   private PlaylistDTO createPlaylistWithId() {
-    // Create DTO based on JSON string
-    String playlistDTOJson = "{\"id\":\"1\",\"name\":\"Test Playlist\",\"musics\":[{\"name\":\"Test Music\",\"artistsList\":[\"Artist 1\",\"Artist 2\"],\"album\":\"Test Album\",\"duration_s\":180.0,\"playlist\":[{\"name\":\"Test Playlist\"}],\"liked\":true}]}";
-    ConvertsData deserialize = new ConvertsData();
-    return deserialize.getData(playlistDTOJson, PlaylistDTO.class);
+    // Create mocks
+    PlaylistEntity mockPlaylistEntity = Mockito.mock(PlaylistEntity.class);
+    MusicEntity mockMusicEntity = Mockito.mock(MusicEntity.class);
+    // Define mock behavior
+    Mockito.when(mockPlaylistEntity.getId()).thenReturn(1L);
+    Mockito.when(mockPlaylistEntity.getName()).thenReturn("Test Playlist");
+    Mockito.when(mockMusicEntity.getId()).thenReturn(null);
+    Mockito.when(mockMusicEntity.getName()).thenReturn("Test Music");
+    Mockito.when(mockMusicEntity.getArtists()).thenReturn(List.of(new Artist("A1"), new Artist("A2")));
+    Mockito.when(mockMusicEntity.getAlbumName()).thenReturn("Test Album");
+    Mockito.when(mockMusicEntity.getDuration_ms()).thenReturn(185000);
+    Mockito.when(mockMusicEntity.getLiked()).thenReturn(false);
+    List<MusicEntity> musicsField = new ArrayList<>();
+    musicsField.add(mockMusicEntity);
+    Mockito.when(mockPlaylistEntity.getMusics()).thenReturn(musicsField);
+    return new PlaylistDTO(mockPlaylistEntity);
   }
 }

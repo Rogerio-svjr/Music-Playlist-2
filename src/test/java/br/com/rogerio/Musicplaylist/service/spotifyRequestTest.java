@@ -29,11 +29,11 @@ public class spotifyRequestTest {
   private HttpResponse<String> mockResponse;
   // Inject mocks in ApiConsumption class
   @InjectMocks
-  private spotifyRequest api;
+  private SpotifyRequestService api;
 
   @BeforeEach
   void setUp() {
-    api = new spotifyRequest();
+    api = new SpotifyRequestService();
     MockitoAnnotations.initMocks(this);
   }
 
@@ -107,10 +107,10 @@ public class spotifyRequestTest {
     // and currentTrackName to "In the End"
     try {
       // Reflect searchOfset and currentTrackName fields, supress it's access controls checks and set it's value
-      Field searchOffsetField = spotifyRequest.class.getDeclaredField("searchOffset");
+      Field searchOffsetField = SpotifyRequestService.class.getDeclaredField("searchOffset");
       searchOffsetField.setAccessible(true);
       searchOffsetField.set(api, 10);
-      Field currentTrackNameField = spotifyRequest.class.getDeclaredField("currentTrackName");
+      Field currentTrackNameField = SpotifyRequestService.class.getDeclaredField("currentTrackName");
       currentTrackNameField.setAccessible(true);
       currentTrackNameField.set(api, "In the End");
       // Keep album null

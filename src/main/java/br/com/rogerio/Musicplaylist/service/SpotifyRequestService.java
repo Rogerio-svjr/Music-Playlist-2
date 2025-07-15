@@ -12,7 +12,7 @@ import java.util.Base64;
 import br.com.rogerio.Musicplaylist.dto.AccessToken;
 import br.com.rogerio.Musicplaylist.entity.TrackSearchResult;
 
-public class spotifyRequest {
+public class SpotifyRequestService {
 	private AccessToken token;
 	String accessToken;
 

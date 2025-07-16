@@ -27,6 +27,7 @@ public class spotifyRequestTest {
 
   @Mock
   private HttpResponse<String> mockResponse;
+  
   // Inject mocks in ApiConsumption class
   @InjectMocks
   private SpotifyRequestService api;
@@ -124,7 +125,7 @@ public class spotifyRequestTest {
     // Define expected response behavior. First call returns a fake access token 
     // json string and second returns a fake track search result json string
     when(mockResponse.body())
-    .thenReturn(fakeTenFirstTracksJson);
+      .thenReturn(fakeTenFirstTracksJson);
     // Test nextTrackRequestPage
     TrackSearchResult result = api.previousTrackRequestPage();
     // Verify the last of the 10 tracks' name

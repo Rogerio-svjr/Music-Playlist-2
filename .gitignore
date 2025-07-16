@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Market Rules ###
+src/main/resources/config.properties
+src/test/java/br/com/rogerio/Musicplaylist/config/SpotifyApiAuthCodeTest.java

@@ -32,7 +32,7 @@ public class MusicplaylistApplication implements CommandLineRunner{
 		var apiConsumption = new SpotifyRequestService();
 
 		// Searches a track named "savior" and receives 10 results  
-		TrackSearchResult trackResult = apiConsumption.trackRequest( "Bleed it Out" );
+		TrackSearchResult trackResult = apiConsumption.searchRequest( "Bleed it Out" );
 		List<MusicEntity> items = trackResult.getPlaylist().getMusics();
 		// Print the results
 		try {
@@ -119,7 +119,7 @@ public class MusicplaylistApplication implements CommandLineRunner{
 		var apiConsumption = new SpotifyRequestService();
 
 		// Searches a track named "savior" and receives 10 results  
-		TrackSearchResult trackResult = apiConsumption.trackRequest( "Kingslayer" );
+		TrackSearchResult trackResult = apiConsumption.searchRequest( "Kingslayer" );
 		List<MusicEntity> items = trackResult.getPlaylist().getMusics();
 		// Print the results
 		try {
@@ -158,7 +158,7 @@ public class MusicplaylistApplication implements CommandLineRunner{
 		var apiConsumption = new SpotifyRequestService();
 
 		// Searches a track named "savior" and receives 10 results 
-		TrackSearchResult trackResult = apiConsumption.trackRequest( "Savior" );
+		TrackSearchResult trackResult = apiConsumption.searchRequest( "Savior" );
 		List<MusicEntity> items = trackResult.getPlaylist().getMusics();
 		// Print the results
 		try {

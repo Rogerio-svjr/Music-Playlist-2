@@ -11,11 +11,14 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import br.com.rogerio.Musicplaylist.config.SpotifyApiAuthCode;
 import br.com.rogerio.Musicplaylist.dto.AccessToken;
 import br.com.rogerio.Musicplaylist.entity.TrackSearchResult;
 import br.com.rogerio.Musicplaylist.dto.MusicDTO;
 
+@Service
 public class SpotifyRequestService {
 	private AccessToken token;
 	String accessToken;

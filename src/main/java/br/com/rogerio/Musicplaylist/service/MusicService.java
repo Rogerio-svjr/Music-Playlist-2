@@ -40,7 +40,7 @@ public class MusicService {
       .stream().map(PlaylistEntity::new).toList()));
 
     // Check if music is already on the database
-    // Use an example matcher to ignore "Liked" and "playlist" fields
+    // Use an example matcher to ignore "liked" and "playlist" fields
     ExampleMatcher matcher = ExampleMatcher.matching()
     .withIgnorePaths("liked", "playlist");
     Example<MusicEntity> example = Example.of(musicEntity, matcher);

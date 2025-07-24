@@ -1,10 +1,7 @@
 package br.com.rogerio.Musicplaylist.controller;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -22,8 +19,6 @@ import br.com.rogerio.Musicplaylist.service.MusicService;
 import br.com.rogerio.Musicplaylist.service.SpotifyRequestService;
 
 @WebMvcTest(MusicController.class)
-@AutoConfigureMockMvc(addFilters = false)
-@ExtendWith(MockitoExtension.class)
 public class MusicControllerTest {
   
   @Autowired
@@ -52,6 +47,67 @@ public class MusicControllerTest {
 
     response.andExpect(status().isCreated());
   }
+
+  @Test
+  public void testInsertMusic_RequestBodyWithInvalidData_ShouldReturnStatus400BadRequest() {
+
+  }
+
+  @Test
+  public void testSearchMusic_ShouldSearchMusicInSpotifyAndReturnStatus200Ok() {
+
+  }
+
+  @Test
+  public void testSearchMusic_PathWithoutVariable_ShouldReturnStatus400BadRequest() {
+
+  }
+
+  @Test
+  public void testListAllMusic_ShouldReturnListOfAllMusicsAndStatus200Ok() {
+
+  }
+
+  @Test
+  public void testListAllMusics_NoMusicsInDatabase_ShouldReturnEmptyListAndStatus204NoContent() {
+
+  }
+
+  @Test
+  public void testRequestMusicById_ShouldReturnRequestedMusicAndStatus200Ok() {
+
+  }
+  
+  @Test
+  public void testRequestMusicById_MusicNotInDatabase_ShouldReturnStatus404NotFound() {
+
+  }
+
+  @Test
+  public void testUpdateMusic_ShouldUpdateMusicAndReturnStatus200Ok() {
+
+  }
+
+  @Test
+  public void testUpdateMusic_RequestBodyWithoutId_ShouldReturnStatus400BadRequest() {
+
+  }
+
+  @Test
+  public void testUpdateMusic_RequestBodyNotFound_ShouldReturnStatus404NotFound() {
+
+  }
+
+  @Test
+  public void testDeleteMusic_ShouldDeleteMusicAndReturnStatus204NoContent() {
+
+  }
+
+  @Test
+  public void testDeleteMusic_RequestBodyNotFound_ShouldReturnStatus404NotFound() {
+
+  }
+
 
   private MusicDTO createMusicWithoutId() {
     // Create DTO based on JSON string

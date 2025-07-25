@@ -75,11 +75,13 @@ public class SpotifyRequestService {
 		// Refactor the track name to fit in the url
 		searchName = searchName.replace(" ", "-");
 		this.currentSearchName = searchName;
+
 		// Build the track request with uri and header
 		HttpRequest requestTrack = HttpRequest.newBuilder()
 			.uri( URI.create( "https://api.spotify.com/v1/search?q=" + searchName + "&type=track&limit=" + searchLimit + "&offset=" + searchOffset ) )
 			.header( "Authorization", "Bearer " + this.accessToken )
 			.build();
+			
 		// Send the request and get the response
 		HttpResponse<String> responseGET = null;
 		try {

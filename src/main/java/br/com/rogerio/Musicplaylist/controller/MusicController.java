@@ -62,7 +62,7 @@ public class MusicController {
 
   @PostMapping
   public ResponseEntity<MusicDTO> insertMusic( @RequestBody MusicDTO music ) {
-    return new ResponseEntity<>(musicService.createMusic(music), HttpStatus.CREATED);
+    return new ResponseEntity<>( musicService.createMusic(music), HttpStatus.CREATED );
   }
 
   @PutMapping
